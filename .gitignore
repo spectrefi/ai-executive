@@ -15,6 +15,9 @@
 
 # next.js
 /.next/
+/.next-v1/
+/.next-v2/
+/.next-compare/
 /out/
 
 # production
@@ -35,6 +38,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# local data persistence (replaced by Redis in production)
+/data/
 
 # typescript
 *.tsbuildinfo

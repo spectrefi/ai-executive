@@ -1,12 +1,17 @@
 import { notFound } from "next/navigation";
 import { AI_TOOLS, getToolById } from "@/lib/data/tools";
 import { buildMetadata, toolJsonLd } from "@/lib/seo";
+import { getToolHistory } from "@/lib/data/history";
 import ScoreBadge from "@/components/ScoreBadge";
 import TrendBadge from "@/components/TrendBadge";
 import ComparisonBar from "@/components/ComparisonBar";
+import ScoreHistoryChart from "@/components/ScoreHistoryChart";
 import Link from "next/link";
-import { ExternalLink, ArrowLeft, CheckCircle2, XCircle, Users } from "lucide-react";
+import { ExternalLink, ArrowLeft, CheckCircle2, XCircle, Users, ShieldCheck } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
+import { getOutboundUrl, getAffiliateBadge } from "@/lib/affiliates";
+export const revalidate = 14400;
+
 
 export async function generateStaticParams() {
   return AI_TOOLS.map((t) => ({ slug: t.id }));
@@ -18,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!tool) return {};
   return buildMetadata({
     title: `${tool.name} Review & Benchmarks 2026`,
-    description: `${tool.name} by ${tool.company} — performance scores, pricing, pros & cons, and how it compares to the competition. Updated daily.`,
+    description: `${tool.name} by ${tool.company} — performance scores, pricing, pros & cons, and how it compares to the competition. Refreshed every 4 hours.`,
     path: `/tools/${tool.id}`,
   });
 }
@@ -40,6 +45,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const tool = getToolById(slug);
   if (!tool) notFound();
+  const history = getToolHistory(slug);
 
   return (
     <>
@@ -69,7 +75,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-extrabold text-white">{tool.name}</h1>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
+                <span className="rounded-full bg-[#1e2640] px-2 py-0.5 text-xs text-gray-400">
                   #{tool.currentRank} Global
                 </span>
               </div>
@@ -85,14 +91,21 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               <ScoreBadge score={tool.scores.overall} size="lg" showLabel />
             </div>
             <TrendBadge direction={tool.trending} percent={tool.trendPercent} />
-            <a
-              href={tool.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-500"
-            >
-              Visit {tool.name} <ExternalLink className="h-3.5 w-3.5" />
-            </a>
+            <div className="flex flex-col items-end gap-1.5">
+              <a
+                href={getOutboundUrl(tool.id, tool.website)}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
+              >
+                Try {tool.name} <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+              {getAffiliateBadge(tool.id) && (
+                <span className="text-xs text-gray-600">
+                  Affiliate link — we may earn a commission
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -100,13 +113,13 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           {/* Left: scores + description */}
           <div className="space-y-8 lg:col-span-2">
             {/* Description */}
-            <section className="rounded-xl border border-white/10 bg-white/5 p-6">
+            <section className="rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
               <h2 className="mb-3 text-lg font-bold text-white">About {tool.name}</h2>
               <p className="leading-relaxed text-gray-400">{tool.description}</p>
             </section>
 
             {/* Benchmark scores */}
-            <section className="rounded-xl border border-white/10 bg-white/5 p-6">
+            <section className="rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
               <h2 className="mb-6 text-lg font-bold text-white">Performance Benchmarks</h2>
               <div className="space-y-1">
                 {SCORE_LABELS.map((s) => {
@@ -152,7 +165,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             </section>
 
             {/* Comparisons — all tools for dense internal linking */}
-            <section className="rounded-xl border border-white/10 bg-white/5 p-6">
+            <section className="rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
               <h2 className="mb-4 text-lg font-bold text-white">
                 Compare {tool.name} with Other AI Tools
               </h2>
@@ -161,7 +174,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
                   <Link
                     key={c.id}
                     href={`/compare/${tool.id}-vs-${c.id}`}
-                    className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-300 hover:border-violet-500/40 hover:text-white"
+                    className="inline-flex items-center gap-2 rounded-lg border border-white/[0.07] bg-[#161c28] px-3 py-2 text-sm text-gray-300 hover:border-blue-500/40 hover:text-white"
                   >
                     {c.logo} {tool.name} vs {c.name}
                   </Link>
@@ -173,7 +186,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           {/* Right: sidebar */}
           <div className="space-y-6">
             {/* Quick facts */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+            <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
               <h3 className="mb-4 font-semibold text-white">Quick Facts</h3>
               <dl className="space-y-3 text-sm">
                 {[
@@ -193,10 +206,10 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             </div>
 
             {/* Usage stats */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+            <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
               <h3 className="mb-4 font-semibold text-white">Usage</h3>
               <div className="flex items-center gap-3">
-                <Users className="h-5 w-5 text-violet-400" />
+                <Users className="h-5 w-5 text-blue-400" />
                 <div>
                   <div className="text-lg font-bold text-white">
                     {formatNumber(tool.weeklyUsers)}
@@ -206,14 +219,26 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               </div>
             </div>
 
+            {/* Score history */}
+            {history.length >= 2 && (
+              <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
+                <h3 className="mb-3 font-semibold text-white">Score Trend</h3>
+                <ScoreHistoryChart
+                  data={history}
+                  color={tool.logoColor}
+                  toolName={tool.name}
+                />
+              </div>
+            )}
+
             {/* Best for */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+            <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
               <h3 className="mb-3 font-semibold text-white">Best For</h3>
               <div className="flex flex-wrap gap-2">
                 {tool.bestFor.map((b) => (
                   <span
                     key={b}
-                    className="rounded-full bg-violet-500/10 px-2.5 py-1 text-xs text-violet-300"
+                    className="rounded-full bg-blue-500/10 px-2.5 py-1 text-xs text-blue-300"
                   >
                     {b}
                   </span>
@@ -222,20 +247,56 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             </div>
 
             {/* Industries */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+            <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
               <h3 className="mb-3 font-semibold text-white">Industries</h3>
               <div className="flex flex-wrap gap-2">
                 {tool.industries.map((ind) => (
                   <Link
                     key={ind}
                     href={`/best-ai-for/${ind}`}
-                    className="rounded-full bg-white/10 px-2.5 py-1 text-xs text-gray-300 hover:text-white"
+                    className="rounded-full bg-[#1e2640] px-2.5 py-1 text-xs text-gray-300 hover:text-white"
                   >
                     {ind}
                   </Link>
                 ))}
               </div>
             </div>
+
+            {/* Enterprise Readiness */}
+            {tool.enterprise && (
+              <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
+                <h3 className="mb-4 flex items-center gap-2 font-semibold text-white">
+                  <ShieldCheck className="h-4 w-4 text-blue-400" />
+                  Enterprise Readiness
+                </h3>
+                <dl className="space-y-2.5 text-sm">
+                  {([
+                    { label: "SOC 2", value: tool.enterprise.soc2 },
+                    { label: "GDPR", value: tool.enterprise.gdpr },
+                    { label: "HIPAA", value: tool.enterprise.hipaa },
+                    { label: "Data Residency", value: tool.enterprise.dataResidency },
+                    { label: "SLA", value: tool.enterprise.sla },
+                    { label: "Support", value: tool.enterprise.support },
+                  ] as { label: string; value: boolean | string | null | undefined }[]).map(({ label, value }) => {
+                    if (value === null || value === undefined) return null;
+                    let display: React.ReactNode;
+                    if (value === true) {
+                      display = <span className="font-medium text-emerald-400">✓ Yes</span>;
+                    } else if (value === false) {
+                      display = <span className="font-medium text-red-400">✗ No</span>;
+                    } else {
+                      display = <span className="font-medium text-amber-300">{value}</span>;
+                    }
+                    return (
+                      <div key={label} className="flex justify-between gap-3">
+                        <dt className="text-gray-500">{label}</dt>
+                        <dd>{display}</dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+              </div>
+            )}
           </div>
         </div>
       </div>

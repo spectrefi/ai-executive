@@ -1,0 +1,17 @@
+name: Daily Social Post v2
+
+on:
+  schedule:
+    - cron: "59 16 * * *"
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate and publish daily social post (v2)
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/generate-post-v2" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 3660

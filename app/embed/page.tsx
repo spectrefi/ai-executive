@@ -1,6 +1,8 @@
 import { AI_TOOLS } from "@/lib/data/tools";
 import { SITE_URL, SITE_NAME } from "@/lib/seo";
 import Link from "next/link";
+export const revalidate = 14400;
+
 
 export const metadata = {
   title: `Embed the AI Leaderboard | ${SITE_NAME}`,
@@ -27,7 +29,7 @@ export default function EmbedPage() {
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Embed instructions */}
         <div className="space-y-6">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+          <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
             <h2 className="mb-3 font-semibold text-white">How to embed</h2>
             <ol className="space-y-3 text-sm text-gray-300 list-decimal list-inside">
               <li>Copy the code snippet below.</li>
@@ -36,7 +38,7 @@ export default function EmbedPage() {
             </ol>
           </div>
 
-          <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-5">
+          <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-medium text-white">Embed code</span>
               <span className="text-xs text-gray-500">Standard · 360 × 520px</span>
@@ -46,7 +48,7 @@ export default function EmbedPage() {
             </pre>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-2 text-sm text-gray-400">
+          <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5 space-y-2 text-sm text-gray-400">
             <div className="font-medium text-white">Customisation options</div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
               <span className="text-gray-500">Width</span><span>Any — responsive</span>
@@ -60,7 +62,7 @@ export default function EmbedPage() {
           <div className="text-xs text-gray-600">
             By embedding this widget you agree to display the "Powered by AI Executive" attribution link
             unchanged. No other requirements. Data is provided free under{" "}
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300">
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
               CC BY 4.0
             </a>.
           </div>
@@ -70,7 +72,7 @@ export default function EmbedPage() {
         <div>
           <div className="mb-3 text-sm font-medium text-gray-400">Live preview</div>
           <div
-            className="rounded-xl border border-white/10 bg-[#0d0d18] p-4"
+            className="rounded-xl border border-white/[0.07] bg-[#0d0d18] p-4"
             style={{ width: 360 }}
           >
             {/* Widget header */}
@@ -81,7 +83,7 @@ export default function EmbedPage() {
               </div>
               <Link
                 href="/"
-                className="text-xs text-violet-400 hover:text-violet-300"
+                className="text-xs text-blue-400 hover:text-blue-300"
               >
                 AI Executive ↗
               </Link>
@@ -93,7 +95,7 @@ export default function EmbedPage() {
                 <Link
                   key={tool.id}
                   href={`/tools/${tool.id}`}
-                  className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-white/5 transition-colors"
+                  className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-[#161c28] transition-colors"
                 >
                   <span className="w-5 text-center text-xs text-gray-500 font-mono flex-shrink-0">
                     {tool.currentRank}
@@ -106,7 +108,7 @@ export default function EmbedPage() {
                   >
                     {tool.scores.overall}
                   </span>
-                  <div className="w-16 h-1.5 rounded-full bg-white/10 flex-shrink-0">
+                  <div className="w-16 h-1.5 rounded-full bg-[#1e2640] flex-shrink-0">
                     <div
                       className="h-full rounded-full"
                       style={{
@@ -122,7 +124,7 @@ export default function EmbedPage() {
             {/* Widget footer */}
             <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
               <span className="text-xs text-gray-600">Powered by</span>
-              <Link href="/" className="text-xs font-semibold text-violet-400 hover:text-violet-300">
+              <Link href="/" className="text-xs font-semibold text-blue-400 hover:text-blue-300">
                 AI Executive
               </Link>
             </div>

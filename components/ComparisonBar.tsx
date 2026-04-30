@@ -24,7 +24,7 @@ export default function ComparisonBar({ label, scores }: Props) {
         {scores.map((s) => (
           <div key={s.name} className="flex items-center gap-2">
             <span className="w-20 text-right text-xs text-gray-600">{s.name}</span>
-            <div className="flex-1 overflow-hidden rounded-full bg-white/5">
+            <div className="flex-1 overflow-hidden rounded-full bg-[#161c28]">
               <div
                 className="h-2 rounded-full transition-all duration-500"
                 style={{

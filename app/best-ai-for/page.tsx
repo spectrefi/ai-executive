@@ -2,6 +2,8 @@ import { buildMetadata } from "@/lib/seo";
 import { INDUSTRIES, USE_CASES } from "@/lib/data/tools";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+export const revalidate = 14400;
+
 
 export const metadata = buildMetadata({
   title: "Best AI Tools by Use Case & Industry",
@@ -28,18 +30,18 @@ export default function BestAiForPage() {
             <Link
               key={ind.value}
               href={`/best-ai-for/${ind.value}`}
-              className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-violet-500/40 hover:bg-white/8"
+              className="group flex items-center justify-between rounded-xl border border-white/[0.07] bg-[#161c28] p-5 transition-all hover:border-blue-500/40 hover:bg-[#1a2235]"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{ind.icon}</span>
                 <div>
-                  <div className="font-semibold text-white group-hover:text-violet-300">
+                  <div className="font-semibold text-white group-hover:text-blue-300">
                     {ind.label}
                   </div>
                   <div className="text-xs text-gray-500">See top AI tools</div>
                 </div>
               </div>
-              <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-violet-400" />
+              <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-blue-400" />
             </Link>
           ))}
         </div>
@@ -53,18 +55,18 @@ export default function BestAiForPage() {
             <Link
               key={uc.slug}
               href={`/best-ai-for/${uc.slug}`}
-              className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-violet-500/40 hover:bg-white/8"
+              className="group flex items-center justify-between rounded-xl border border-white/[0.07] bg-[#161c28] p-5 transition-all hover:border-blue-500/40 hover:bg-[#1a2235]"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{uc.icon}</span>
                 <div>
-                  <div className="font-semibold text-white group-hover:text-violet-300">
+                  <div className="font-semibold text-white group-hover:text-blue-300">
                     {uc.label}
                   </div>
                   <div className="text-xs text-gray-500">Top AI tools</div>
                 </div>
               </div>
-              <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-violet-400" />
+              <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-blue-400" />
             </Link>
           ))}
         </div>

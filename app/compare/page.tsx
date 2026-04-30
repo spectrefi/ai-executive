@@ -2,6 +2,8 @@ import { buildMetadata } from "@/lib/seo";
 import { AI_TOOLS } from "@/lib/data/tools";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+export const revalidate = 14400;
+
 
 export const metadata = buildMetadata({
   title: "Compare AI Tools — Side-by-Side Benchmarks",
@@ -48,7 +50,7 @@ export default function ComparePage() {
               <Link
                 key={`${a}-${b}`}
                 href={`/compare/${a}-vs-${b}`}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-violet-500/40 hover:bg-white/8"
+                className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-[#161c28] p-4 transition-all hover:border-blue-500/40 hover:bg-[#1a2235]"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{toolA.logo}</span>
@@ -70,10 +72,10 @@ export default function ComparePage() {
         <p className="mb-6 text-sm text-gray-500">
           Click any cell to see the full head-to-head comparison.
         </p>
-        <div className="overflow-x-auto rounded-xl border border-white/10">
+        <div className="overflow-x-auto rounded-xl border border-white/[0.07]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10 bg-white/5">
+              <tr className="border-b border-white/[0.07] bg-[#161c28]">
                 <th className="px-4 py-3 text-left text-xs text-gray-500" />
                 {AI_TOOLS.map((t) => (
                   <th key={t.id} className="px-3 py-3 text-center text-xs text-gray-400">
@@ -95,7 +97,7 @@ export default function ComparePage() {
                       ) : (
                         <Link
                           href={`/compare/${rowTool.id}-vs-${colTool.id}`}
-                          className="inline-block rounded bg-white/10 px-2 py-0.5 text-xs text-gray-400 hover:bg-violet-500/30 hover:text-violet-300"
+                          className="inline-block rounded bg-[#1e2640] px-2 py-0.5 text-xs text-gray-400 hover:bg-blue-500/30 hover:text-blue-300"
                         >
                           vs
                         </Link>

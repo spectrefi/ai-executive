@@ -1,0 +1,111 @@
+import { type SocialPost } from "@/lib/social-post-archive";
+
+function daysAgo(n: number, hour = 16, min = 55): string {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  d.setHours(hour, min, 0, 0);
+  return d.toISOString();
+}
+
+export const SAMPLE_POSTS: SocialPost[] = [
+  {
+    id: "sample-0",
+    date: daysAgo(0).slice(0, 10),
+    caption: "OpenAI just quietly killed GPT-4 for new users. The era of GPT-4o is official — and it's not looking back. 🔥 #OpenAI #GPT4o #AI",
+    newsTitle: "OpenAI deprecates GPT-4 access for new API users, moves all traffic to GPT-4o",
+    newsSource: "OpenAI Blog",
+    newsLink: "https://openai.com/blog",
+    visualTheme: "pulse",
+    postedAt: daysAgo(0),
+  },
+  {
+    id: "sample-1",
+    date: daysAgo(1).slice(0, 10),
+    caption: "Claude just hit 100 million users. Anthropic went from zero to the fastest-growing AI in history. 🚀 #Claude #Anthropic #AI",
+    newsTitle: "Anthropic announces Claude crosses 100M monthly active users",
+    newsSource: "Anthropic",
+    newsLink: "https://anthropic.com",
+    visualTheme: "glitch",
+    postedAt: daysAgo(1),
+  },
+  {
+    id: "sample-2",
+    date: daysAgo(2).slice(0, 10),
+    caption: "Google's Gemini 2.5 Pro now reads 1 MILLION tokens in a single context window. That's every Shakespeare play. Twice. 🤖 #Gemini #Google #LLM",
+    newsTitle: "Gemini 2.5 Pro reaches 1M token context window in public release",
+    newsSource: "Google DeepMind",
+    newsLink: "https://deepmind.google",
+    visualTheme: "neon",
+    postedAt: daysAgo(2),
+  },
+  {
+    id: "sample-3",
+    date: daysAgo(3).slice(0, 10),
+    caption: "Cursor just hit 5 million users. It took GitHub Copilot 2 years to get there. Cursor did it in 8 months. ⚡ #Cursor #AICode #Developer",
+    newsTitle: "Cursor reaches 5M users — fastest-growing developer tool in history",
+    newsSource: "TechCrunch",
+    newsLink: "https://techcrunch.com",
+    visualTheme: "matrix",
+    postedAt: daysAgo(3),
+  },
+  {
+    id: "sample-4",
+    date: daysAgo(4).slice(0, 10),
+    caption: "Meta AI is now bigger than ChatGPT by user count. 500M people. Hidden in plain sight. 💥 #MetaAI #Llama #AI",
+    newsTitle: "Meta AI surpasses 500M monthly users across WhatsApp, Instagram and Facebook",
+    newsSource: "The Verge",
+    newsLink: "https://theverge.com",
+    visualTheme: "fire",
+    postedAt: daysAgo(4),
+  },
+  {
+    id: "sample-5",
+    date: daysAgo(5).slice(0, 10),
+    caption: "ElevenLabs v3 can clone any voice in 3 seconds. You can't tell the difference. This is either incredible or terrifying. 🌌 #ElevenLabs #VoiceAI #AI",
+    newsTitle: "ElevenLabs launches v3 voice model with 3-second cloning and zero-shot synthesis",
+    newsSource: "VentureBeat",
+    newsLink: "https://venturebeat.com",
+    visualTheme: "cosmic",
+    postedAt: daysAgo(5),
+  },
+  {
+    id: "sample-6",
+    date: daysAgo(6).slice(0, 10),
+    caption: "DeepSeek is running on a $6M cluster what OpenAI spent $100M to train. The efficiency gap is closing FAST. 📢 #DeepSeek #AI #LLM",
+    newsTitle: "DeepSeek R2 training cost analysis reveals 94% efficiency gain over GPT-4",
+    newsSource: "Ars Technica",
+    newsLink: "https://arstechnica.com",
+    visualTheme: "viral",
+    postedAt: daysAgo(6),
+  },
+  {
+    id: "sample-7",
+    date: daysAgo(7).slice(0, 10),
+    caption: "Grok 3 just beat GPT-4o on MMLU. Elon's AI is no longer a joke. 🔔 #Grok #xAI #AIBenchmark",
+    newsTitle: "xAI releases Grok 3 benchmark results — outperforms GPT-4o on MMLU by 4 points",
+    newsSource: "xAI",
+    newsLink: "https://x.ai",
+    visualTheme: "breaking",
+    postedAt: daysAgo(7),
+  },
+  {
+    id: "sample-8",
+    date: daysAgo(8).slice(0, 10),
+    caption: "Perplexity just hit 100M users without a single dollar spent on ads. Pure product growth. Rare. ⚡ #Perplexity #AI #SearchAI",
+    newsTitle: "Perplexity AI announces 100M monthly active users, zero paid acquisition",
+    newsSource: "Wired",
+    newsLink: "https://wired.com",
+    visualTheme: "pulse",
+    postedAt: daysAgo(8),
+  },
+  {
+    id: "sample-9",
+    date: daysAgo(9).slice(0, 10),
+    caption: "Runway Gen-4 just made Hollywood-quality video generation a $12/month subscription. The studios are scared. 🔥 #Runway #AIVideo #GenerativeAI",
+    newsTitle: "Runway launches Gen-4 — cinematic video generation at consumer pricing",
+    newsSource: "MIT Technology Review",
+    newsLink: "https://technologyreview.com",
+    visualTheme: "neon",
+    postedAt: daysAgo(9),
+  },
+];

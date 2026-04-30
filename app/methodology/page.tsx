@@ -1,6 +1,8 @@
 import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+export const revalidate = 14400;
+
 
 export const metadata = buildMetadata({
   title: "Methodology: How AI Executive Scores Are Calculated",
@@ -119,7 +121,7 @@ export default function MethodologyPage() {
       </p>
 
       {/* Principles */}
-      <section className="mb-10 rounded-xl border border-white/10 bg-white/5 p-6 space-y-4">
+      <section className="mb-10 rounded-xl border border-white/[0.07] bg-[#161c28] p-6 space-y-4">
         <h2 className="text-xl font-bold text-white">Principles</h2>
         <ul className="space-y-2 text-gray-300 text-sm list-disc list-inside">
           <li>All scores aggregate from <strong>publicly available, independent benchmarks</strong> — we do not use vendor-supplied numbers as primary sources.</li>
@@ -135,7 +137,7 @@ export default function MethodologyPage() {
         {DIMENSIONS.map((d) => {
           const badge = TYPE_BADGE[d.type];
           return (
-            <div key={d.name} className="rounded-xl border border-white/10 bg-white/5 p-5">
+            <div key={d.name} className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
               <div className="flex flex-wrap items-center gap-3 mb-2">
                 <span className="font-semibold text-white">{d.name}</span>
                 <span
@@ -143,7 +145,7 @@ export default function MethodologyPage() {
                 >
                   {badge.label}
                 </span>
-                <span className="rounded-full bg-violet-500/10 px-2.5 py-0.5 text-xs text-violet-300">
+                <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs text-blue-300">
                   Weight: {d.weight}
                 </span>
                 <span className="ml-auto text-xs text-gray-500">Updated: {d.cadence}</span>
@@ -154,7 +156,7 @@ export default function MethodologyPage() {
                   href={d.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"
+                  className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300"
                 >
                   {d.source} <ExternalLink className="h-3 w-3" />
                 </a>
@@ -167,7 +169,7 @@ export default function MethodologyPage() {
       </section>
 
       {/* Primary sources */}
-      <section className="mb-10 rounded-xl border border-white/10 bg-white/5 p-6">
+      <section className="mb-10 rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
         <h2 className="text-xl font-bold text-white mb-4">Primary Data Sources</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {[
@@ -180,10 +182,10 @@ export default function MethodologyPage() {
             { name: "MMMU", desc: "Multimodal understanding benchmark", url: "https://mmmu-benchmark.github.io" },
             { name: "Official pricing pages", desc: "Cost calculations — verified monthly", url: "" },
           ].map((s) => (
-            <div key={s.name} className="rounded-lg bg-white/5 px-4 py-3">
+            <div key={s.name} className="rounded-lg bg-[#161c28] px-4 py-3">
               <div className="font-medium text-sm text-white">
                 {s.url ? (
-                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-violet-300">
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-blue-300">
                     {s.name} <ExternalLink className="h-3 w-3" />
                   </a>
                 ) : s.name}
@@ -207,7 +209,7 @@ export default function MethodologyPage() {
       </section>
 
       {/* Corrections CTA */}
-      <section className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-6 text-center">
+      <section className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-6 text-center">
         <h2 className="text-lg font-bold text-white mb-2">Spot an Inaccuracy?</h2>
         <p className="text-sm text-gray-400 mb-4">
           We review all data submissions within 48 hours. Flag it on any tool profile or email us directly.
@@ -215,13 +217,13 @@ export default function MethodologyPage() {
         <div className="flex justify-center gap-4 flex-wrap">
           <Link
             href="/tools"
-            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-500"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
           >
             Browse Tool Profiles
           </Link>
           <a
             href="mailto:data@aiexecutive.io"
-            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white"
+            className="rounded-lg border border-white/[0.07] bg-[#161c28] px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white"
           >
             Email data@aiexecutive.io
           </a>

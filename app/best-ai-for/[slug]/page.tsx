@@ -4,6 +4,8 @@ import ToolCard from "@/components/ToolCard";
 import ScoreBadge from "@/components/ScoreBadge";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+export const revalidate = 14400;
+
 
 const ALL_SLUGS = [
   ...INDUSTRIES.map((i) => i.value),
@@ -104,9 +106,9 @@ export default async function BestAiForSlugPage({ params }: { params: Promise<{ 
           <Link
             key={tool.id}
             href={`/tools/${tool.id}`}
-            className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-violet-500/40 hover:bg-white/8"
+            className="flex items-center gap-4 rounded-xl border border-white/[0.07] bg-[#161c28] p-4 transition-all hover:border-blue-500/40 hover:bg-[#1a2235]"
           >
-            <span className="w-6 text-center text-sm font-bold text-violet-400">
+            <span className="w-6 text-center text-sm font-bold text-blue-400">
               #{i + 1}
             </span>
             <span
@@ -159,7 +161,7 @@ export default async function BestAiForSlugPage({ params }: { params: Promise<{ 
               <Link
                 key={ind.value}
                 href={`/best-ai-for/${ind.value}`}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-400 hover:border-violet-500/40 hover:text-white"
+                className="rounded-full border border-white/[0.07] bg-[#161c28] px-3 py-1.5 text-xs text-gray-400 hover:border-blue-500/40 hover:text-white"
               >
                 {ind.icon} {ind.label}
               </Link>

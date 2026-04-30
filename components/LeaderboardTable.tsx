@@ -2,15 +2,43 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AI_TOOLS, type AITool, type BenchmarkScores } from "@/lib/data/tools";
+import { type BenchmarkScores } from "@/lib/data/tools";
+import { type ToolBuzz } from "@/lib/sentiment";
 import ScoreBadge from "./ScoreBadge";
 import TrendBadge from "./TrendBadge";
 import { formatNumber, rankDelta } from "@/lib/utils";
-import { ArrowUpDown, ExternalLink } from "lucide-react";
+import { ArrowUpDown, Flame, Activity, Minus } from "lucide-react";
+
+// Minimal shape — only what the table renders. Internal fields (sources, pros, cons,
+// enterprise, specs, weeklyUsers estimates) stay server-side and never ship to the client.
+export interface LeaderboardRow {
+  id: string;
+  name: string;
+  company: string;
+  logo: string;
+  logoColor: string;
+  currentRank: number;
+  previousRank: number;
+  scores: BenchmarkScores;
+  weeklyUsers: number;
+  trending: "up" | "down" | "stable";
+  trendPercent: number;
+}
 
 type SortKey = keyof BenchmarkScores | "weeklyUsers" | "currentRank";
 
-export default function LeaderboardTable() {
+const BUZZ_CONFIG = {
+  hot:    { icon: Flame,    color: "text-orange-400", bg: "bg-orange-500/10", label: "Hot" },
+  active: { icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10", label: "Active" },
+  quiet:  { icon: Minus,    color: "text-gray-600",   bg: "bg-[#161c28]",       label: "Quiet" },
+};
+
+interface Props {
+  tools: LeaderboardRow[];
+  sentiment?: Record<string, ToolBuzz>;
+}
+
+export default function LeaderboardTable({ tools, sentiment }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("currentRank");
   const [sortAsc, setSortAsc] = useState(true);
 
@@ -23,7 +51,7 @@ export default function LeaderboardTable() {
     }
   }
 
-  const sorted = [...AI_TOOLS].sort((a, b) => {
+  const sorted = [...tools].sort((a, b) => {
     let aVal: number;
     let bVal: number;
 
@@ -51,10 +79,10 @@ export default function LeaderboardTable() {
   ];
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10">
+    <div className="overflow-x-auto rounded-xl border border-white/[0.07]">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-white/10 bg-white/5">
+          <tr className="border-b border-white/[0.07] bg-[#161c28]">
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
               Rank
             </th>
@@ -79,6 +107,12 @@ export default function LeaderboardTable() {
             <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
               Trend
             </th>
+            <th
+              className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500"
+              title="Community buzz from HackerNews & Reddit — last 7 days"
+            >
+              Community Buzz
+            </th>
             <th className="px-4 py-3" />
           </tr>
         </thead>
@@ -88,7 +122,7 @@ export default function LeaderboardTable() {
             return (
               <tr
                 key={tool.id}
-                className="border-b border-white/5 transition-colors hover:bg-white/5"
+                className="border-b border-white/5 transition-colors hover:bg-[#161c28]"
               >
                 {/* Rank */}
                 <td className="px-4 py-4">
@@ -96,7 +130,7 @@ export default function LeaderboardTable() {
                     <span
                       className={
                         tool.currentRank <= 3
-                          ? "text-lg font-bold text-violet-400"
+                          ? "text-lg font-bold text-blue-400"
                           : "text-sm font-semibold text-gray-400"
                       }
                     >
@@ -122,7 +156,7 @@ export default function LeaderboardTable() {
                       {tool.logo}
                     </span>
                     <div>
-                      <div className="font-semibold text-white group-hover:text-violet-400">
+                      <div className="font-semibold text-white group-hover:text-blue-400">
                         {tool.name}
                       </div>
                       <div className="text-xs text-gray-500">{tool.company}</div>
@@ -157,12 +191,44 @@ export default function LeaderboardTable() {
                   />
                 </td>
 
+                {/* Community Buzz */}
+                <td className="px-4 py-4 text-center">
+                  {(() => {
+                    const buzz = sentiment?.[tool.id];
+                    if (!buzz) return <span className="text-xs text-gray-700">—</span>;
+                    const cfg = BUZZ_CONFIG[buzz.level];
+                    const Icon = cfg.icon;
+                    return (
+                      <div className="flex flex-col items-center gap-1">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.color}`}>
+                          <Icon className="h-3 w-3" />
+                          {cfg.label}
+                        </span>
+                        {buzz.buzzScore > 0 && (
+                          <span className="text-xs text-gray-600">{buzz.buzzScore.toLocaleString()} pts</span>
+                        )}
+                        {buzz.topStory && (
+                          <a
+                            href={buzz.topStory.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={buzz.topStory.title}
+                            className="max-w-[140px] truncate text-xs text-gray-600 hover:text-blue-400"
+                          >
+                            {buzz.topStory.source === "hn" ? "HN" : "Reddit"}: {buzz.topStory.title.slice(0, 40)}…
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </td>
+
                 {/* CTA */}
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/tools/${tool.id}`}
-                      className="rounded-md bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-white/10 hover:text-white"
+                      className="rounded-md bg-[#161c28] px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-[#1e2640] hover:text-white"
                     >
                       Profile
                     </Link>

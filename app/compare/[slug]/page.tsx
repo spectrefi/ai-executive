@@ -4,7 +4,11 @@ import { buildMetadata, comparisonJsonLd, faqJsonLd } from "@/lib/seo";
 import ScoreBadge from "@/components/ScoreBadge";
 import ComparisonBar from "@/components/ComparisonBar";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, CheckCircle2, XCircle, ExternalLink, Share2 } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
+import { getOutboundUrl, getAffiliateBadge } from "@/lib/affiliates";
+export const revalidate = 14400;
+
 
 export async function generateStaticParams() {
   const pairs: { slug: string }[] = [];
@@ -84,14 +88,15 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
             <span className="text-gray-500">vs</span>{" "}
             {toolB.name}
           </h1>
-          <p className="text-gray-400">
+          <p className="mb-4 text-gray-400">
             Head-to-head benchmark comparison · Updated{" "}
             {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
           </p>
+          <ShareButton path={`/compare/${idA}-vs-${idB}`} label={`${toolA.name} vs ${toolB.name}`} />
         </div>
 
         {/* Winner banner */}
-        <div className="mb-8 rounded-xl border border-violet-500/30 bg-violet-500/10 p-5 text-center">
+        <div className="mb-8 rounded-xl border border-blue-500/30 bg-blue-500/10 p-5 text-center">
           <div className="text-2xl mb-1">{winner.logo}</div>
           <div className="text-lg font-bold text-white">
             {winner.name} leads overall
@@ -106,7 +111,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
           {[toolA, toolB].map((tool) => (
             <div
               key={tool.id}
-              className="rounded-xl border border-white/10 bg-white/5 p-5 text-center"
+              className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5 text-center"
             >
               <div
                 className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
@@ -119,19 +124,22 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
               <ScoreBadge score={tool.scores.overall} size="lg" showLabel />
               <div className="mt-3 text-xs text-gray-500">{tool.specs.latestModel}</div>
               <a
-                href={tool.website}
+                href={getOutboundUrl(tool.id, tool.website)}
                 target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"
+                rel="noopener noreferrer sponsored"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500"
               >
-                Visit <ExternalLink className="h-3 w-3" />
+                Try {tool.name} <ExternalLink className="h-3 w-3" />
               </a>
+              {getAffiliateBadge(tool.id) && (
+                <p className="mt-1 text-xs text-gray-600">Affiliate link</p>
+              )}
             </div>
           ))}
         </div>
 
         {/* Score bars */}
-        <section className="mb-8 rounded-xl border border-white/10 bg-white/5 p-6">
+        <section className="mb-8 rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
           <h2 className="mb-6 text-lg font-bold text-white">Benchmark Comparison</h2>
           {SCORE_DIMENSIONS.map((d) => (
             <ComparisonBar
@@ -156,7 +164,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
         {/* Pros/cons side by side */}
         <section className="mb-8 grid grid-cols-2 gap-6">
           {[toolA, toolB].map((tool) => (
-            <div key={tool.id} className="rounded-xl border border-white/10 bg-white/5 p-5">
+            <div key={tool.id} className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
               <h3 className="mb-3 font-bold text-white">
                 {tool.logo} {tool.name}
               </h3>
@@ -179,7 +187,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
         </section>
 
         {/* Quick verdict */}
-        <section className="mb-8 rounded-xl border border-white/10 bg-white/5 p-6">
+        <section className="mb-8 rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
           <h2 className="mb-4 text-lg font-bold text-white">Quick Verdict</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -187,7 +195,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
               <ul className="space-y-1 text-sm text-gray-400">
                 {toolA.bestFor.map((b) => (
                   <li key={b} className="flex items-start gap-1.5">
-                    <span className="text-violet-400">→</span> {b}
+                    <span className="text-blue-400">→</span> {b}
                   </li>
                 ))}
               </ul>
@@ -197,11 +205,38 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
               <ul className="space-y-1 text-sm text-gray-400">
                 {toolB.bestFor.map((b) => (
                   <li key={b} className="flex items-start gap-1.5">
-                    <span className="text-violet-400">→</span> {b}
+                    <span className="text-blue-400">→</span> {b}
                   </li>
                 ))}
               </ul>
             </div>
+          </div>
+        </section>
+
+        {/* Affiliate CTA */}
+        <section className="mb-8 rounded-xl border border-blue-500/20 bg-blue-500/5 p-6">
+          <h2 className="mb-1 text-lg font-bold text-white">Ready to get started?</h2>
+          <p className="mb-5 text-sm text-gray-400">
+            Try either tool free — no credit card required for free tiers.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {[toolA, toolB].map((tool) => (
+              <div key={tool.id} className="flex flex-col gap-1">
+                <a
+                  href={getOutboundUrl(tool.id, tool.website)}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500"
+                >
+                  <span>{tool.logo}</span>
+                  Try {tool.name}
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+                {getAffiliateBadge(tool.id) && (
+                  <span className="text-xs text-gray-600 pl-1">Affiliate link</span>
+                )}
+              </div>
+            ))}
           </div>
         </section>
 
@@ -213,7 +248,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
               <Link
                 key={t.id}
                 href={`/compare/${toolA.id}-vs-${t.id}`}
-                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-400 hover:border-violet-500/40 hover:text-white"
+                className="rounded-lg border border-white/[0.07] bg-[#161c28] px-3 py-1.5 text-xs text-gray-400 hover:border-blue-500/40 hover:text-white"
               >
                 {toolA.name} vs {t.name}
               </Link>
@@ -225,7 +260,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
               <Link
                 key={t.id}
                 href={`/compare/${toolB.id}-vs-${t.id}`}
-                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-400 hover:border-violet-500/40 hover:text-white"
+                className="rounded-lg border border-white/[0.07] bg-[#161c28] px-3 py-1.5 text-xs text-gray-400 hover:border-blue-500/40 hover:text-white"
               >
                 {toolB.name} vs {t.name}
               </Link>
