@@ -1,0 +1,15 @@
+name: Send Email Digest
+
+on:
+  workflow_dispatch:
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send daily email digest to subscribers
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/send-digest" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 60

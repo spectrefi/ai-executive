@@ -1,4 +1,4 @@
-name: Daily Social Post
+name: Daily Social Post + Email Digest
 
 on:
   schedule:
@@ -15,3 +15,10 @@ jobs:
             -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             --max-time 3660
+
+      - name: Send daily email digest
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/send-digest" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 60
