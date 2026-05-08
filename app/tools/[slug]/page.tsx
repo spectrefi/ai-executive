@@ -164,6 +164,35 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               </div>
             </section>
 
+            {/* Bottom CTA — high intent after reading pros/cons */}
+            <section className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-950/40 to-indigo-950/40 p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-white">
+                    Ready to try {tool.name}?
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-400">
+                    {tool.pricing.free
+                      ? `Free tier available — no credit card required. Paid plans from ${tool.pricing.startingAt}.`
+                      : `Plans start from ${tool.pricing.startingAt}.`}
+                  </p>
+                </div>
+                <a
+                  href={getOutboundUrl(tool.id, tool.website)}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-500"
+                >
+                  Get Started Free <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+              {getAffiliateBadge(tool.id) && (
+                <p className="mt-3 text-xs text-gray-600">
+                  Affiliate link — we earn a commission if you sign up, at no extra cost to you.
+                </p>
+              )}
+            </section>
+
             {/* Comparisons — all tools for dense internal linking */}
             <section className="rounded-xl border border-white/[0.07] bg-[#161c28] p-6">
               <h2 className="mb-4 text-lg font-bold text-white">

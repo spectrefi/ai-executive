@@ -7,9 +7,11 @@ import LeaderboardTable from "@/components/LeaderboardTable";
 import NewsCard from "@/components/NewsCard";
 import ToolCard from "@/components/ToolCard";
 import ExecSummary from "@/components/ExecSummary";
+import SubscribeForm from "@/components/SubscribeForm";
 import Link from "next/link";
-import { TrendingUp, RefreshCw, BarChart3, ArrowRight } from "lucide-react";
+import { TrendingUp, RefreshCw, BarChart3, ArrowRight, ExternalLink, Zap } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
+import { getOutboundUrl } from "@/lib/affiliates";
 export const revalidate = 14400;
 
 
@@ -185,6 +187,68 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+        </section>
+
+        {/* Editor's Pick — featured tool spotlight */}
+        {(() => {
+          const featured = AI_TOOLS.find((t) => t.id === "cursor") ?? AI_TOOLS[0];
+          return (
+            <section className="mt-16">
+              <div className="mb-4 flex items-center gap-2">
+                <Zap className="h-4 w-4 text-yellow-400" />
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-yellow-400">Editor&apos;s Pick</h2>
+              </div>
+              <div className="rounded-2xl border border-yellow-500/20 bg-gradient-to-r from-yellow-950/30 to-orange-950/20 p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-4">
+                    <span
+                      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl"
+                      style={{ backgroundColor: `${featured.logoColor}22` }}
+                    >
+                      {featured.logo}
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white text-lg">{featured.name}</span>
+                        <span className="rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-xs font-semibold text-yellow-400">
+                          #{featured.currentRank} Global
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-400 mt-0.5">{featured.tagline}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Link
+                      href={`/tools/${featured.id}`}
+                      className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white"
+                    >
+                      Full Review
+                    </Link>
+                    <a
+                      href={getOutboundUrl(featured.id, featured.website)}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="inline-flex items-center gap-2 rounded-xl bg-yellow-500 px-4 py-2.5 text-sm font-bold text-black hover:bg-yellow-400"
+                    >
+                      Try Free <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
+          );
+        })()}
+
+        {/* Email capture */}
+        <section className="mt-16 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-950/40 to-indigo-950/40 p-10 text-center">
+          <h2 className="mb-2 text-2xl font-extrabold text-white">
+            Stay ahead of the AI curve
+          </h2>
+          <p className="mb-8 text-gray-400">
+            Weekly rankings digest — which tools are rising, falling, and why. No fluff.
+          </p>
+          <SubscribeForm />
+          <p className="mt-4 text-xs text-gray-600">No spam. Unsubscribe any time.</p>
         </section>
 
         {/* Popular comparisons */}

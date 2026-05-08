@@ -7,7 +7,8 @@ import { type ToolBuzz } from "@/lib/sentiment";
 import ScoreBadge from "./ScoreBadge";
 import TrendBadge from "./TrendBadge";
 import { formatNumber, rankDelta } from "@/lib/utils";
-import { ArrowUpDown, Flame, Activity, Minus } from "lucide-react";
+import { ArrowUpDown, Flame, Activity, Minus, ExternalLink, Zap } from "lucide-react";
+import { getOutboundUrl } from "@/lib/affiliates";
 
 // Minimal shape — only what the table renders. Internal fields (sources, pros, cons,
 // enterprise, specs, weeklyUsers estimates) stay server-side and never ship to the client.
@@ -120,6 +121,21 @@ export default function LeaderboardTable({ tools, sentiment }: Props) {
           {sorted.map((tool, i) => {
             const delta = rankDelta(tool.currentRank, tool.previousRank);
             return (
+              <>
+              {i === 3 && (
+                <tr key="sponsored" className="border-b border-yellow-500/10 bg-yellow-500/5">
+                  <td colSpan={cols.length + 4} className="px-4 py-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2 text-xs text-yellow-500/70">
+                        <Zap className="h-3 w-3" />
+                        <span className="font-semibold uppercase tracking-wider">Sponsored</span>
+                        <span className="text-gray-600">·</span>
+                        <span className="text-gray-500">Want your tool featured here? <a href="mailto:hello@aiexecutive.io" className="text-yellow-500 hover:text-yellow-400">Get in touch</a></span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
               <tr
                 key={tool.id}
                 className="border-b border-white/5 transition-colors hover:bg-[#161c28]"
@@ -232,9 +248,18 @@ export default function LeaderboardTable({ tools, sentiment }: Props) {
                     >
                       Profile
                     </Link>
+                    <a
+                      href={getOutboundUrl(tool.id, "#")}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="hidden rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 lg:inline-flex items-center gap-1"
+                    >
+                      Try <ExternalLink className="h-3 w-3" />
+                    </a>
                   </div>
                 </td>
               </tr>
+              </>
             );
           })}
         </tbody>

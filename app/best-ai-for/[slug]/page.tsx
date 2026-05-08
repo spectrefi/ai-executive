@@ -2,8 +2,10 @@ import { AI_TOOLS, INDUSTRIES, USE_CASES, type Industry, type BenchmarkScores } 
 import { buildMetadata } from "@/lib/seo";
 import ToolCard from "@/components/ToolCard";
 import ScoreBadge from "@/components/ScoreBadge";
+import SubscribeForm from "@/components/SubscribeForm";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
+import { getOutboundUrl } from "@/lib/affiliates";
 export const revalidate = 14400;
 
 
@@ -103,27 +105,28 @@ export default async function BestAiForSlugPage({ params }: { params: Promise<{ 
       {/* Ranked list */}
       <div className="mb-12 space-y-3">
         {tools.map((tool, i) => (
-          <Link
+          <div
             key={tool.id}
-            href={`/tools/${tool.id}`}
             className="flex items-center gap-4 rounded-xl border border-white/[0.07] bg-[#161c28] p-4 transition-all hover:border-blue-500/40 hover:bg-[#1a2235]"
           >
             <span className="w-6 text-center text-sm font-bold text-blue-400">
               #{i + 1}
             </span>
-            <span
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl"
-              style={{ backgroundColor: `${tool.logoColor}22` }}
-            >
-              {tool.logo}
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-white">{tool.name}</span>
-                <span className="text-xs text-gray-500">{tool.company}</span>
+            <Link href={`/tools/${tool.id}`} className="flex flex-1 min-w-0 items-center gap-3">
+              <span
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl"
+                style={{ backgroundColor: `${tool.logoColor}22` }}
+              >
+                {tool.logo}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white">{tool.name}</span>
+                  <span className="text-xs text-gray-500">{tool.company}</span>
+                </div>
+                <p className="truncate text-xs text-gray-500">{tool.tagline}</p>
               </div>
-              <p className="truncate text-xs text-gray-500">{tool.tagline}</p>
-            </div>
+            </Link>
             <div className="flex items-center gap-3">
               <div className="text-right">
                 <ScoreBadge score={tool.scores[scoreKey]} size="sm" />
@@ -136,10 +139,30 @@ export default async function BestAiForSlugPage({ params }: { params: Promise<{ 
                   Free
                 </span>
               )}
+              <a
+                href={getOutboundUrl(tool.id, tool.website)}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                onClick={(e) => e.stopPropagation()}
+                className="hidden shrink-0 items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 sm:inline-flex"
+              >
+                Try <ExternalLink className="h-3 w-3" />
+              </a>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
+
+      {/* Email capture */}
+      <section className="mb-12 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-950/40 to-indigo-950/40 p-8 text-center">
+        <h2 className="mb-2 text-xl font-bold text-white">
+          Get weekly AI rankings for {label}
+        </h2>
+        <p className="mb-6 text-sm text-gray-400">
+          We track every benchmark, pricing change, and model release. One email a week, no spam.
+        </p>
+        <SubscribeForm />
+      </section>
 
       {/* Card grid */}
       <section>
