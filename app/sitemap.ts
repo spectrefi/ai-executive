@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { AI_TOOLS, INDUSTRIES, USE_CASES } from "@/lib/data/tools";
 import { SITE_URL } from "@/lib/seo";
 
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
@@ -18,8 +19,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/context-window`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
     { url: `${SITE_URL}/funding`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/hardware-advisor`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${SITE_URL}/alternatives`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
+    { url: `${SITE_URL}/jobs`, lastModified: now, changeFrequency: "daily", priority: 0.85 },
+    { url: `${SITE_URL}/advertise`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/enterprise-report`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/trends`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/pricing`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/methodology`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/embed`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
   ];
@@ -59,11 +64,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }));
 
+  const alternativesPages: MetadataRoute.Sitemap = AI_TOOLS.map((t) => ({
+    url: `${SITE_URL}/alternatives/${t.id}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
   return [
     ...staticPages,
     ...toolPages,
     ...comparisonPages,
     ...industryPages,
     ...useCasePages,
+    ...alternativesPages,
   ];
 }
