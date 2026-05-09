@@ -3,20 +3,97 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Zap, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Zap, Menu, X, ChevronDown } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
-const NAV_LINKS = [
+const PRIMARY_LINKS = [
   { href: "/", label: "Leaderboard" },
   { href: "/compare", label: "Compare" },
   { href: "/tools", label: "All Tools" },
   { href: "/best-ai-for", label: "By Use Case" },
+];
+
+const INTELLIGENCE_LINKS = [
+  { href: "/prompt-lab", label: "🧪 Prompt Lab", desc: "One prompt, five models, you vote" },
+  { href: "/status", label: "🟢 AI Status", desc: "Live uptime for 12 AI services" },
+  { href: "/changelog", label: "📋 Changelog", desc: "Every model release & price cut" },
+  { href: "/price-index", label: "💰 API Pricing", desc: "Cost calculator for every model" },
+  { href: "/context-window", label: "📏 Context Windows", desc: "Token limits across all models" },
+  { href: "/funding", label: "📈 VC Funding", desc: "Rounds, valuations, what it means" },
+  { href: "/hardware-advisor", label: "🖥️ Hardware Advisor", desc: "Which models can your PC run?" },
+];
+
+const MORE_LINKS = [
   { href: "/daily-update", label: "Daily Updates" },
   { href: "/social-pulse", label: "Social Pulse" },
   { href: "/trends", label: "Trends" },
   { href: "/pricing", label: "Pricing" },
   { href: "/methodology", label: "Methodology" },
 ];
+
+const ALL_MOBILE_LINKS = [
+  ...PRIMARY_LINKS,
+  ...INTELLIGENCE_LINKS.map((l) => ({ href: l.href, label: l.label })),
+  ...MORE_LINKS,
+];
+
+function DropdownMenu({
+  label,
+  links,
+  pathname,
+}: {
+  label: string;
+  links: { href: string; label: string; desc?: string }[];
+  pathname: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const isActive = links.some((l) => pathname === l.href);
+
+  useEffect(() => {
+    function handle(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className={cn(
+          "flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors relative",
+          isActive
+            ? "text-white after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:rounded-full after:bg-blue-400"
+            : "text-gray-400 hover:bg-[#161c28] hover:text-white"
+        )}
+      >
+        {label}
+        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 w-64 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0e1117] shadow-2xl">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className={cn(
+                "flex flex-col gap-0.5 px-4 py-3 text-sm transition-colors hover:bg-[#161c28]",
+                pathname === l.href ? "bg-[#161c28] text-white" : "text-gray-300"
+              )}
+            >
+              <span className="font-medium">{l.label}</span>
+              {l.desc && <span className="text-xs text-gray-600">{l.desc}</span>}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -37,7 +114,7 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 md:flex">
-          {NAV_LINKS.map((l) => (
+          {PRIMARY_LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -51,6 +128,9 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+
+          <DropdownMenu label="Intelligence" links={INTELLIGENCE_LINKS} pathname={pathname} />
+          <DropdownMenu label="More" links={MORE_LINKS} pathname={pathname} />
         </nav>
 
         {/* Live badge */}
@@ -73,7 +153,7 @@ export default function Navbar() {
       {/* Mobile nav */}
       {open && (
         <div className="border-t border-white/[0.07] bg-[#0e1117] px-4 pb-4 md:hidden">
-          {NAV_LINKS.map((l) => (
+          {ALL_MOBILE_LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
