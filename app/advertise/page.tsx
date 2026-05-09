@@ -64,7 +64,7 @@ const PACKAGES = [
     badge: "Premium",
     features: [
       "Homepage Editor's Pick spotlight (above the fold)",
-      "Featured across all 25 tool detail pages",
+      `Featured across all ${AI_TOOLS.length} tool detail pages`,
       "Included in email digest header",
       "Custom write-up by our editorial team",
       "Social mention on launch",
@@ -77,7 +77,7 @@ const PACKAGES = [
 const STATS = [
   { value: "25,000+", label: "Monthly visitors", icon: Users },
   { value: "2,000+", label: "Email subscribers", icon: Mail },
-  { value: "25", label: "AI tools ranked", icon: Zap },
+  { value: String(AI_TOOLS.length), label: "AI tools ranked", icon: Zap },
   { value: "300+", label: "Comparison pages", icon: TrendingUp },
 ];
 

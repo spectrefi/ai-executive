@@ -58,10 +58,10 @@ export default function EnterpriseReportPage() {
         </h1>
         <p className="mx-auto mb-6 max-w-2xl text-lg text-gray-400">
           Everything a CTO, VP of Engineering, or IT leader needs to evaluate, select, and deploy AI tools at enterprise scale.
-          Built from benchmark data, pricing analysis, and enterprise readiness audits across 25 platforms.
+          Built from benchmark data, pricing analysis, and enterprise readiness audits across {AI_TOOLS.length} platforms.
         </p>
         <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-          <span>✓ 25 AI tools assessed</span>
+          <span>✓ {AI_TOOLS.length} AI tools assessed</span>
           <span>✓ 6 evaluation dimensions</span>
           <span>✓ Updated May 2026</span>
           <span>✓ Free with email</span>
