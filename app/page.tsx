@@ -18,7 +18,7 @@ export const revalidate = 14400;
 export const metadata = buildMetadata({
   title: "AI Tool Rankings & Live Benchmarks 2026",
   description:
-    "Live leaderboard of the top 25 AI tools globally. Performance benchmarks, side-by-side comparisons, and industry-specific rankings. Refreshed every 4 hours.",
+    `Live leaderboard of the top ${AI_TOOLS.length} AI tools globally. Performance benchmarks, side-by-side comparisons, and industry-specific rankings. Refreshed every 4 hours.`,
   path: "/",
 });
 

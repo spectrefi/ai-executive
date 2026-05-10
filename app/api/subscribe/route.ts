@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
+import { SITE_URL } from "@/lib/constants";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiexecutive.io";
 
 const WELCOME_HTML = `
 <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;color:#e2e8f0;background:#0e1117;padding:32px;border-radius:12px">
@@ -14,6 +15,13 @@ const WELCOME_HTML = `
 `;
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 5 subscribes per IP per hour
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const allowed = await rateLimit(`subscribe:${ip}`, 5, 3600);
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => null);
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
@@ -24,13 +32,11 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   if (apiKey) {
     await Promise.allSettled([
-      // Add to audience list
       fetch("https://api.resend.com/contacts", {
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({ email, unsubscribed: false, audience_id: process.env.RESEND_AUDIENCE_ID ?? "" }),
       }),
-      // Send welcome email
       fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },

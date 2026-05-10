@@ -1,30 +1,23 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
+import { POST_THEMES, VALID_THEMES } from "@/lib/social-post-themes";
 
 export const runtime = "edge";
-
-const THEMES: Record<string, { bg: string; glow: string; accent: string; secondary: string; emoji: string }> = {
-  pulse:    { bg: "#0a0014", glow: "#a855f7", accent: "#a855f7", secondary: "#ec4899", emoji: "⚡" },
-  glitch:   { bg: "#001409", glow: "#00ff88", accent: "#00ff88", secondary: "#00ccff", emoji: "🔥" },
-  neon:     { bg: "#00061a", glow: "#00d4ff", accent: "#00d4ff", secondary: "#ff006e", emoji: "🚀" },
-  matrix:   { bg: "#000a00", glow: "#00ff41", accent: "#00ff41", secondary: "#39ff14", emoji: "🤖" },
-  fire:     { bg: "#180400", glow: "#ff4d00", accent: "#ff6b00", secondary: "#ffd700", emoji: "💥" },
-  cosmic:   { bg: "#04001a", glow: "#7c3aed", accent: "#818cf8", secondary: "#ec4899", emoji: "🌌" },
-  viral:    { bg: "#160000", glow: "#ff1744", accent: "#ff4466", secondary: "#ff6d00", emoji: "📢" },
-  breaking: { bg: "#0a0a00", glow: "#ffd700", accent: "#ffd700", secondary: "#ff9500", emoji: "🔔" },
-};
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const caption = searchParams.get("caption") ?? "AI is changing everything.";
-  const themeKey = (searchParams.get("theme") ?? "pulse") as keyof typeof THEMES;
+  const themeKey = searchParams.get("theme") ?? "pulse";
   const source = searchParams.get("source") ?? "AI Executive";
-  const theme = THEMES[themeKey] ?? THEMES.pulse;
+  const theme = POST_THEMES[VALID_THEMES.includes(themeKey as any) ? themeKey as keyof typeof POST_THEMES : "pulse"];
 
   const bodyText = caption.replace(/#\w+/g, "").trim();
   const tags = (caption.match(/#\w+/g) ?? []).join("  ");
 
-  return new ImageResponse(
+  const OG_LONG_TEXT_THRESHOLD = 120;
+  const OG_MAX_WIDTH = 960;
+
+  const response = new ImageResponse(
     (
       <div
         style={{
@@ -84,12 +77,12 @@ export async function GET(req: NextRequest) {
         {/* Main text */}
         <div
           style={{
-            fontSize: bodyText.length > 120 ? 34 : 40,
+            fontSize: bodyText.length > OG_LONG_TEXT_THRESHOLD ? 34 : 40,
             fontWeight: 900,
             color: "#ffffff",
             textAlign: "center",
             lineHeight: 1.3,
-            maxWidth: 960,
+            maxWidth: OG_MAX_WIDTH,
             textShadow: `0 0 60px ${theme.glow}99`,
             letterSpacing: "-0.01em",
           }}
@@ -141,4 +134,7 @@ export async function GET(req: NextRequest) {
     ),
     { width: 1200, height: 628 }
   );
+
+  response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=3600");
+  return response;
 }

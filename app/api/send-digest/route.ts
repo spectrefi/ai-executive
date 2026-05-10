@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSocialPosts } from "@/lib/social-post-archive";
 import { AI_TOOLS } from "@/lib/data/tools";
+import { POST_THEMES } from "@/lib/social-post-themes";
+import { SITE_URL } from "@/lib/constants";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiexecutive.io";
+const EMAIL_SUBJECT_TITLE_MAX = 60;
+
+function escapeHtmlAttr(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
 function buildEmailHtml(post: {
   caption: string;
@@ -21,17 +32,10 @@ function buildEmailHtml(post: {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
 
-  const themeColors: Record<string, { bg: string; accent: string }> = {
-    pulse:   { bg: "#1a0a2e", accent: "#a855f7" },
-    glitch:  { bg: "#0a1a0e", accent: "#00ff88" },
-    neon:    { bg: "#0a1520", accent: "#00d4ff" },
-    matrix:  { bg: "#0a150a", accent: "#00ff41" },
-    fire:    { bg: "#1a0a00", accent: "#ff6b00" },
-    cosmic:  { bg: "#0e0e1a", accent: "#818cf8" },
-    viral:   { bg: "#1a0010", accent: "#ff4466" },
-    breaking:{ bg: "#1a1400", accent: "#ffd700" },
-  };
-  const theme = themeColors[post.visualTheme] ?? themeColors.pulse;
+  const theme = POST_THEMES[post.visualTheme as keyof typeof POST_THEMES] ?? POST_THEMES.pulse;
+
+  const safeNewsLink = post.newsLink ? escapeHtmlAttr(post.newsLink) : null;
+  const safeTweetUrl = post.tweetUrl ? escapeHtmlAttr(post.tweetUrl) : null;
 
   return `<!DOCTYPE html>
 <html>
@@ -58,8 +62,8 @@ function buildEmailHtml(post: {
         <p style="color:#e2e8f0;font-size:15px;line-height:1.6;margin:0;font-style:italic">${post.caption}</p>
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        ${post.newsLink ? `<a href="${post.newsLink}" style="display:inline-block;background:${theme.accent};color:#000;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;text-decoration:none">Read Full Story →</a>` : ""}
-        ${post.tweetUrl ? `<a href="${post.tweetUrl}" style="display:inline-block;background:#1d9bf0;color:#fff;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;text-decoration:none">View on X →</a>` : ""}
+        ${safeNewsLink ? `<a href="${safeNewsLink}" style="display:inline-block;background:${theme.accent};color:#000;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;text-decoration:none">Read Full Story →</a>` : ""}
+        ${safeTweetUrl ? `<a href="${safeTweetUrl}" style="display:inline-block;background:#1d9bf0;color:#fff;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;text-decoration:none">View on X →</a>` : ""}
       </div>
     </div>
 
@@ -130,15 +134,16 @@ export async function POST(req: NextRequest) {
   });
 
   const html = buildEmailHtml(latest);
+  const titlePreview = latest.newsTitle.slice(0, EMAIL_SUBJECT_TITLE_MAX);
+  const subjectSuffix = latest.newsTitle.length > EMAIL_SUBJECT_TITLE_MAX ? "…" : "";
 
-  // Create broadcast
   const createRes = await fetch("https://api.resend.com/broadcasts", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       audience_id: audienceId,
       from: "AI Executive <hello@aiexecutive.io>",
-      subject: `AI Briefing ${formattedDate}: ${latest.newsTitle.slice(0, 60)}${latest.newsTitle.length > 60 ? "…" : ""}`,
+      subject: `AI Briefing ${formattedDate}: ${titlePreview}${subjectSuffix}`,
       html,
     }),
   });
@@ -151,7 +156,6 @@ export async function POST(req: NextRequest) {
 
   const { id: broadcastId } = await createRes.json() as { id: string };
 
-  // Send broadcast
   const sendRes = await fetch(`https://api.resend.com/broadcasts/${broadcastId}/send`, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },

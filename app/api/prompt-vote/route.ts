@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { DAILY_PROMPTS } from "@/lib/data/prompts";
 
 export const runtime = "nodejs";
 
-// Use the same Redis pattern as vote-store.ts
 let redis: import("@upstash/redis").Redis | null = null;
 
 async function getRedis() {
@@ -18,9 +18,17 @@ async function getRedis() {
 
 const VOTE_KEY_PREFIX = "prompt-vote:";
 
+const VALID_PROMPT_IDS = new Set(DAILY_PROMPTS.map((p) => p.id));
+const VALID_MODEL_IDS = new Set(
+  DAILY_PROMPTS.flatMap((p) => p.responses.map((r) => r.model))
+);
+
 export async function GET(req: NextRequest) {
   const promptId = req.nextUrl.searchParams.get("promptId");
   if (!promptId) return NextResponse.json({ error: "Missing promptId" }, { status: 400 });
+  if (!VALID_PROMPT_IDS.has(promptId)) {
+    return NextResponse.json({ error: "Invalid promptId" }, { status: 400 });
+  }
 
   const r = await getRedis();
   if (!r) return NextResponse.json({ votes: {} });
@@ -33,13 +41,19 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const { promptId, modelId } = body ?? {};
+
   if (!promptId || !modelId) {
     return NextResponse.json({ error: "Missing promptId or modelId" }, { status: 400 });
+  }
+  if (!VALID_PROMPT_IDS.has(promptId)) {
+    return NextResponse.json({ error: "Invalid promptId" }, { status: 400 });
+  }
+  if (!VALID_MODEL_IDS.has(modelId)) {
+    return NextResponse.json({ error: "Invalid modelId" }, { status: 400 });
   }
 
   const r = await getRedis();
   if (!r) {
-    // In-memory fallback: just acknowledge
     return NextResponse.json({ ok: true, votes: { [modelId]: 1 } });
   }
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TWITTER_CHAR_LIMIT } from "@/lib/constants";
 import { generateDailyPost } from "@/lib/social-post-generator";
 import { addSocialPost, type SocialPost } from "@/lib/social-post-archive";
 import { postTweet } from "@/lib/twitter-client";
@@ -51,8 +52,8 @@ export async function POST(req: NextRequest) {
     if (process.env.TWITTER_APP_KEY && process.env.TWITTER_ACCESS_TOKEN) {
       try {
         const tweetText = newsItem.link
-          ? `${caption}\n\n${newsItem.link}`.slice(0, 280)
-          : caption.slice(0, 280);
+          ? `${caption}\n\n${newsItem.link}`.slice(0, TWITTER_CHAR_LIMIT)
+          : caption.slice(0, TWITTER_CHAR_LIMIT);
         const result = await postTweet(tweetText, imageBuffer);
         tweetId = result.id;
         tweetUrl = result.url;
