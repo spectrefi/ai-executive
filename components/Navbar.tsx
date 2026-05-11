@@ -15,11 +15,15 @@ const PRIMARY_LINKS = [
 
 const INTELLIGENCE_LINKS = [
   { href: "/prompt-lab", label: "🧪 Prompt Lab", desc: "One prompt, five models, you vote" },
+  { href: "/hacks", label: "⚡ AI Hacks", desc: "Prompt tricks & shortcuts, community-voted" },
+  { href: "/hot-takes", label: "🔥 Hot Takes", desc: "AI's most controversial opinions — vote now" },
+  { href: "/movers", label: "📈 Market Movers", desc: "Stocks, funding & tool momentum" },
+  { href: "/weekly", label: "📅 Weekly Digest", desc: "Everything that mattered this week" },
   { href: "/status", label: "🟢 AI Status", desc: "Live uptime for 12 AI services" },
   { href: "/changelog", label: "📋 Changelog", desc: "Every model release & price cut" },
   { href: "/price-index", label: "💰 API Pricing", desc: "Cost calculator for every model" },
   { href: "/context-window", label: "📏 Context Windows", desc: "Token limits across all models" },
-  { href: "/funding", label: "📈 VC Funding", desc: "Rounds, valuations, what it means" },
+  { href: "/funding", label: "💸 VC Funding", desc: "Rounds, valuations, what it means" },
   { href: "/hardware-advisor", label: "🖥️ Hardware Advisor", desc: "Which models can your PC run?" },
   { href: "/quiz", label: "🎯 AI Buyer's Quiz", desc: "Find your perfect AI stack in 60 seconds" },
 ];
