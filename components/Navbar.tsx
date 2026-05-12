@@ -11,6 +11,7 @@ const PRIMARY_LINKS = [
   { href: "/compare", label: "Compare" },
   { href: "/tools", label: "All Tools" },
   { href: "/best-ai-for", label: "By Use Case" },
+  { href: "/my-stack", label: "My Stack" },
 ];
 
 const INTELLIGENCE_LINKS = [

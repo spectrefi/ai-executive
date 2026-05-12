@@ -1,0 +1,24 @@
+name: Weekly Power Rankings
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"  # Every Monday at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  rankings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post power rankings thread + email
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/power-rankings" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 90
+
+      - name: Send tool rank-change alerts
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/tool-alerts/send" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 60

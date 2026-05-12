@@ -71,6 +71,28 @@ export async function getBatchTweetMetrics(
   }
 }
 
+/** Post a thread — each string is one tweet, replies are chained automatically */
+export async function postThread(
+  tweets: string[]
+): Promise<{ ids: string[]; firstUrl: string }> {
+  if (!isConfigured()) throw new Error("Twitter not configured");
+  const client = getClient();
+  const rw = client.readWrite;
+  const ids: string[] = [];
+  let replyToId: string | undefined;
+
+  for (const text of tweets) {
+    const tweet = await rw.v2.tweet({
+      text,
+      ...(replyToId ? { reply: { in_reply_to_tweet_id: replyToId } } : {}),
+    });
+    ids.push(tweet.data.id);
+    replyToId = tweet.data.id;
+  }
+
+  return { ids, firstUrl: `https://x.com/i/web/status/${ids[0]}` };
+}
+
 export async function postTweet(
   text: string,
   imageBuffer?: Buffer

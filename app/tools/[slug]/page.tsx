@@ -10,6 +10,7 @@ import Link from "next/link";
 import { ExternalLink, ArrowLeft, CheckCircle2, XCircle, Users, ShieldCheck } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
 import { getOutboundUrl, getAffiliateBadge } from "@/lib/affiliates";
+import ToolAlertSubscribe from "@/components/ToolAlertSubscribe";
 export const revalidate = 14400;
 
 
@@ -326,6 +327,8 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
                 </dl>
               </div>
             )}
+            {/* Rank alert */}
+            <ToolAlertSubscribe toolId={tool.id} toolName={tool.name} />
           </div>
         </div>
       </div>

@@ -1,6 +1,4 @@
-import { AI_TOOLS } from "@/lib/data/tools";
 import { SITE_URL, SITE_NAME } from "@/lib/seo";
-import Link from "next/link";
 export const revalidate = 14400;
 
 
@@ -11,13 +9,8 @@ export const metadata = {
   robots: { index: true, follow: true },
 };
 
-const TOP_10 = AI_TOOLS.sort((a, b) => a.currentRank - b.currentRank).slice(0, 10);
-
-const SCORE_COLOR = (s: number) =>
-  s >= 88 ? "#34d399" : s >= 75 ? "#60a5fa" : s >= 60 ? "#fbbf24" : "#f87171";
-
 export default function EmbedPage() {
-  const iframeCode = `<iframe src="${SITE_URL}/embed" width="360" height="520" frameborder="0" style="border-radius:12px;border:1px solid #ffffff18;" title="AI Tool Rankings by AI Executive"></iframe>`;
+  const iframeCode = `<iframe src="${SITE_URL}/embed/widget" width="360" height="520" frameborder="0" style="border-radius:12px;border:1px solid #ffffff18;" title="AI Tool Rankings by AI Executive"></iframe>`;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
@@ -68,67 +61,16 @@ export default function EmbedPage() {
           </div>
         </div>
 
-        {/* Live preview of the widget itself */}
+        {/* Live preview — actual iframe of the widget */}
         <div>
           <div className="mb-3 text-sm font-medium text-gray-400">Live preview</div>
-          <div
-            className="rounded-xl border border-white/[0.07] bg-[#0d0d18] p-4"
-            style={{ width: 360 }}
-          >
-            {/* Widget header */}
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="font-bold text-white text-sm">AI Tool Rankings</div>
-                <div className="text-xs text-gray-500">Updated daily · Top 10</div>
-              </div>
-              <Link
-                href="/"
-                className="text-xs text-blue-400 hover:text-blue-300"
-              >
-                AI Executive ↗
-              </Link>
-            </div>
-
-            {/* Rankings */}
-            <div className="space-y-1.5">
-              {TOP_10.map((tool) => (
-                <Link
-                  key={tool.id}
-                  href={`/tools/${tool.id}`}
-                  className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-[#161c28] transition-colors"
-                >
-                  <span className="w-5 text-center text-xs text-gray-500 font-mono flex-shrink-0">
-                    {tool.currentRank}
-                  </span>
-                  <span className="text-base flex-shrink-0">{tool.logo}</span>
-                  <span className="flex-1 text-sm text-gray-200 truncate">{tool.name}</span>
-                  <span
-                    className="text-xs font-bold flex-shrink-0"
-                    style={{ color: SCORE_COLOR(tool.scores.overall) }}
-                  >
-                    {tool.scores.overall}
-                  </span>
-                  <div className="w-16 h-1.5 rounded-full bg-[#1e2640] flex-shrink-0">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${tool.scores.overall}%`,
-                        backgroundColor: SCORE_COLOR(tool.scores.overall),
-                      }}
-                    />
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Widget footer */}
-            <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-              <span className="text-xs text-gray-600">Powered by</span>
-              <Link href="/" className="text-xs font-semibold text-blue-400 hover:text-blue-300">
-                AI Executive
-              </Link>
-            </div>
-          </div>
+          <iframe
+            src="/embed/widget"
+            width={360}
+            height={520}
+            style={{ borderRadius: 12, border: "1px solid #ffffff18", display: "block" }}
+            title="AI Tool Rankings by AI Executive"
+          />
         </div>
       </div>
     </div>
