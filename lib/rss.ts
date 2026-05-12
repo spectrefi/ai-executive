@@ -185,6 +185,7 @@ export async function fetchLiveNews(): Promise<NewsItem[]> {
         });
         if (!res.ok) return;
         const xml = await res.text();
+        if (xml.length > 2 * 1024 * 1024) return; // skip feeds > 2MB
         const rawItems = parseItems(xml);
 
         // Build NewsItem objects for all AI-relevant items from this feed

@@ -43,11 +43,15 @@ export async function postToInstagram(
   const accountId = process.env.INSTAGRAM_ACCOUNT_ID!;
   const token = process.env.INSTAGRAM_ACCESS_TOKEN!;
 
+  const authHeader = { Authorization: `Bearer ${token}` };
+
   // Step 1 — create media container
-  const createRes = await fetch(
-    `${BASE}/${accountId}/media?image_url=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(caption)}&access_token=${token}`,
-    { method: "POST" }
-  );
+  const createBody = new URLSearchParams({ image_url: imageUrl, caption });
+  const createRes = await fetch(`${BASE}/${accountId}/media`, {
+    method: "POST",
+    headers: { ...authHeader, "Content-Type": "application/x-www-form-urlencoded" },
+    body: createBody.toString(),
+  });
   const created = await createRes.json() as { id?: string; error?: { message: string } };
   if (!created.id) {
     console.error("Instagram media container failed:", created.error?.message);
@@ -55,10 +59,12 @@ export async function postToInstagram(
   }
 
   // Step 2 — publish container
-  const publishRes = await fetch(
-    `${BASE}/${accountId}/media_publish?creation_id=${created.id}&access_token=${token}`,
-    { method: "POST" }
-  );
+  const publishBody = new URLSearchParams({ creation_id: created.id });
+  const publishRes = await fetch(`${BASE}/${accountId}/media_publish`, {
+    method: "POST",
+    headers: { ...authHeader, "Content-Type": "application/x-www-form-urlencoded" },
+    body: publishBody.toString(),
+  });
   const published = await publishRes.json() as { id?: string; error?: { message: string } };
   if (!published.id) {
     console.error("Instagram publish failed:", published.error?.message);
@@ -77,9 +83,9 @@ export async function getIgMetrics(mediaId: string): Promise<IgMetrics | null> {
   try {
     const token = process.env.INSTAGRAM_ACCESS_TOKEN!;
     const fields = "impressions,reach,like_count,comments_count,saved";
-    const res = await fetch(
-      `${BASE}/${mediaId}/insights?metric=${fields}&access_token=${token}`
-    );
+    const res = await fetch(`${BASE}/${mediaId}/insights?metric=${fields}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await res.json() as { data?: { name: string; values: { value: number }[] }[]; error?: unknown };
     if (!data.data) return null;
 

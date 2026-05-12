@@ -6,6 +6,15 @@ const VISUAL_THEMES = [
   "pulse", "glitch", "neon", "matrix", "fire", "cosmic", "viral", "breaking",
 ];
 
+// Strip characters that could be used for prompt injection from RSS-sourced strings
+function sanitizeForPrompt(str: string): string {
+  return str
+    .replace(/[\x00-\x1F\x7F]/g, " ")
+    .replace(/\bIGNORE\b|\bFORGET\b|\bSYSTEM\b|\bINSTRUCTION\b/gi, "")
+    .trim()
+    .slice(0, 200);
+}
+
 export interface GeneratedPost {
   caption: string;
   newsItem: NewsItem;
@@ -13,6 +22,9 @@ export interface GeneratedPost {
 }
 
 export async function generateDailyPost(): Promise<GeneratedPost> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set");
+
   let news = await fetchLiveNews().catch(() => []);
   if (news.length < 5) news = DAILY_NEWS;
 
@@ -20,11 +32,11 @@ export async function generateDailyPost(): Promise<GeneratedPost> {
   const recent = news.filter((item) => new Date(item.date) >= cutoff);
   const pool = recent.length >= 3 ? recent : news;
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const client = new Anthropic({ apiKey });
 
   const newsContext = pool
     .slice(0, 12)
-    .map((n, i) => `${i + 1}. [${n.impact.toUpperCase()}] ${n.title} — ${n.source}`)
+    .map((n, i) => `${i + 1}. [${n.impact.toUpperCase()}] ${sanitizeForPrompt(n.title)} — ${sanitizeForPrompt(n.source)}`)
     .join("\n");
 
   const msg = await client.messages.create({

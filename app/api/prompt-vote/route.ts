@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DAILY_PROMPTS } from "@/lib/data/prompts";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -39,6 +40,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const allowed = await rateLimit(`prompt-vote:${ip}`, 30, 3600);
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => null);
   const { promptId, modelId } = body ?? {};
 

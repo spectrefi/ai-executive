@@ -143,7 +143,6 @@ export default async function BestAiForSlugPage({ params }: { params: Promise<{ 
                 href={getOutboundUrl(tool.id, tool.website)}
                 target="_blank"
                 rel="noopener noreferrer sponsored"
-                onClick={(e) => e.stopPropagation()}
                 className="hidden shrink-0 items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 sm:inline-flex"
               >
                 Try <ExternalLink className="h-3 w-3" />

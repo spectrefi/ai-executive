@@ -6,9 +6,9 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const caption = searchParams.get("caption") ?? "AI is changing everything.";
+  const caption = (searchParams.get("caption") ?? "AI is changing everything.").slice(0, 300);
   const themeKey = searchParams.get("theme") ?? "pulse";
-  const source = searchParams.get("source") ?? "AI Executive";
+  const source = (searchParams.get("source") ?? "AI Executive").slice(0, 60);
   const theme = POST_THEMES[VALID_THEMES.includes(themeKey as any) ? themeKey as keyof typeof POST_THEMES : "pulse"];
 
   const bodyText = caption.replace(/#\w+/g, "").trim();
