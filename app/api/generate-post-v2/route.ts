@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { TWITTER_CHAR_LIMIT } from "@/lib/constants";
 import { generateDailyPost } from "@/lib/social-post-generator";
 import { addSocialPost, type SocialPost } from "@/lib/social-post-archive";
@@ -14,8 +15,12 @@ export const runtime = "nodejs";
 export const maxDuration = 3600;
 
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const cronSecret = process.env.CRON_SECRET;
+  const provided = req.headers.get("x-cron-secret") ?? "";
+  const providedBuf = Buffer.from(provided);
+  const secretBuf = Buffer.from(cronSecret ?? "");
+  const authorized = !!cronSecret && providedBuf.length === secretBuf.length && timingSafeEqual(providedBuf, secretBuf);
+  if (!authorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -26,7 +31,7 @@ export async function POST(req: NextRequest) {
     const { caption, newsItem, visualTheme } = await generateDailyPost();
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiexecutive.io";
-    const ogImageUrl = `${siteUrl}/api/og/social-post?caption=${encodeURIComponent(caption)}&theme=${visualTheme}&source=${encodeURIComponent(newsItem.source)}`;
+    const ogImageUrl = `${siteUrl}/api/og/social-post?caption=${encodeURIComponent(caption)}&theme=${encodeURIComponent(visualTheme)}&source=${encodeURIComponent(newsItem.source)}`;
 
     // ── v2: AI-generated image (Flux/Ideogram) ──────────────────────────────
     let aiImageUrl: string | null = null;
@@ -139,6 +144,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, post });
   } catch (e) {
     console.error("generate-post-v2 error:", e);
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    return NextResponse.json({ error: "Failed to generate post" }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { getSocialPosts } from "@/lib/social-post-archive";
 import { AI_TOOLS } from "@/lib/data/tools";
 import { POST_THEMES } from "@/lib/social-post-themes";
@@ -34,8 +35,8 @@ function buildEmailHtml(post: {
 
   const theme = POST_THEMES[post.visualTheme as keyof typeof POST_THEMES] ?? POST_THEMES.pulse;
 
-  const safeNewsLink = post.newsLink ? escapeHtmlAttr(post.newsLink) : null;
-  const safeTweetUrl = post.tweetUrl ? escapeHtmlAttr(post.tweetUrl) : null;
+  const safeNewsLink = post.newsLink && isSafeUrl(post.newsLink) ? escapeHtmlAttr(post.newsLink) : null;
+  const safeTweetUrl = post.tweetUrl && isSafeUrl(post.tweetUrl) ? escapeHtmlAttr(post.tweetUrl) : null;
 
   return `<!DOCTYPE html>
 <html>
@@ -110,9 +111,22 @@ function buildEmailHtml(post: {
 </html>`;
 }
 
+function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const cronSecret = process.env.CRON_SECRET;
+  const provided = req.headers.get("x-cron-secret") ?? "";
+  const providedBuf = Buffer.from(provided);
+  const secretBuf = Buffer.from(cronSecret ?? "");
+  const authorized = !!cronSecret && providedBuf.length === secretBuf.length && timingSafeEqual(providedBuf, secretBuf);
+  if (!authorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -151,7 +165,7 @@ export async function POST(req: NextRequest) {
   if (!createRes.ok) {
     const err = await createRes.json().catch(() => ({}));
     console.error("Resend broadcast create failed:", err);
-    return NextResponse.json({ error: "Failed to create broadcast", detail: err }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create broadcast" }, { status: 500 });
   }
 
   const { id: broadcastId } = await createRes.json() as { id: string };
@@ -164,7 +178,7 @@ export async function POST(req: NextRequest) {
   if (!sendRes.ok) {
     const err = await sendRes.json().catch(() => ({}));
     console.error("Resend broadcast send failed:", err);
-    return NextResponse.json({ error: "Failed to send broadcast", detail: err }, { status: 500 });
+    return NextResponse.json({ error: "Failed to send broadcast" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, broadcastId, post: latest.id });

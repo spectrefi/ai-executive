@@ -4,6 +4,7 @@ import ffmpegStatic from "ffmpeg-static";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { randomBytes } from "crypto";
 
 if (ffmpegStatic) ffmpeg.setFfmpegPath(ffmpegStatic);
 
@@ -40,6 +41,9 @@ export async function imageToVideo(imageUrl: string, theme: string): Promise<Buf
       console.error("Kling failed, falling back to ffmpeg:", e);
     }
   }
+  let parsedUrl: URL;
+  try { parsedUrl = new URL(imageUrl); } catch { throw new Error("Invalid image URL"); }
+  if (parsedUrl.protocol !== "https:") throw new Error("Image URL must use HTTPS");
   const imgRes = await fetch(imageUrl);
   if (!imgRes.ok) throw new Error(`Failed to fetch source image: ${imgRes.status}`);
   return ffmpegStaticLoop(Buffer.from(await imgRes.arrayBuffer()));
@@ -57,10 +61,10 @@ export async function mixAudioIntoVideo(
   if (!voiceoverBuffer && !musicUrl) return videoBuffer;
 
   const tmpDir = os.tmpdir();
-  const ts = Date.now();
-  const videoFile = path.join(tmpDir, `aie-vid-${ts}.mp4`);
-  const voiceFile = voiceoverBuffer ? path.join(tmpDir, `aie-vo-${ts}.mp3`) : null;
-  const outFile = path.join(tmpDir, `aie-mixed-${ts}.mp4`);
+  const rnd = randomBytes(8).toString("hex");
+  const videoFile = path.join(tmpDir, `aie-vid-${rnd}.mp4`);
+  const voiceFile = voiceoverBuffer ? path.join(tmpDir, `aie-vo-${rnd}.mp3`) : null;
+  const outFile = path.join(tmpDir, `aie-mixed-${rnd}.mp4`);
 
   fs.writeFileSync(videoFile, videoBuffer);
   if (voiceoverBuffer && voiceFile) fs.writeFileSync(voiceFile, voiceoverBuffer);
@@ -103,9 +107,9 @@ export async function mixAudioIntoVideo(
  */
 export async function videoToGif(videoBuffer: Buffer): Promise<Buffer> {
   const tmpDir = os.tmpdir();
-  const ts = Date.now();
-  const videoFile = path.join(tmpDir, `aie-gif-in-${ts}.mp4`);
-  const outFile = path.join(tmpDir, `aie-gif-out-${ts}.gif`);
+  const rnd = randomBytes(8).toString("hex");
+  const videoFile = path.join(tmpDir, `aie-gif-in-${rnd}.mp4`);
+  const outFile = path.join(tmpDir, `aie-gif-out-${rnd}.gif`);
 
   fs.writeFileSync(videoFile, videoBuffer);
 
@@ -197,8 +201,9 @@ async function klingGenerate(imageUrl: string, theme: string): Promise<Buffer> {
 
 async function ffmpegStaticLoop(imageBuffer: Buffer): Promise<Buffer> {
   const tmpDir = os.tmpdir();
-  const inFile = path.join(tmpDir, `aie-in-${Date.now()}.png`);
-  const outFile = path.join(tmpDir, `aie-out-${Date.now()}.mp4`);
+  const rnd = randomBytes(8).toString("hex");
+  const inFile = path.join(tmpDir, `aie-in-${rnd}.png`);
+  const outFile = path.join(tmpDir, `aie-out-${rnd}.mp4`);
 
   fs.writeFileSync(inFile, imageBuffer);
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/constants";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
 
 const WELCOME_HTML = `
 <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;color:#e2e8f0;background:#0e1117;padding:32px;border-radius:12px">
