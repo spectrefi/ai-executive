@@ -1,6 +1,6 @@
 import { buildMetadata } from "@/lib/seo";
 import { AI_STOCKS, MOVER_SIGNALS, SIGNAL_META } from "@/lib/data/market-movers";
-import { AI_TOOLS } from "@/lib/data/tools";
+import { getEnrichedTools } from "@/lib/rank-history";
 import Link from "next/link";
 import { TrendingUp, TrendingDown, Minus, BarChart2, ExternalLink } from "lucide-react";
 export const revalidate = 3600;
@@ -25,11 +25,12 @@ function ChangeChip({ pct }: { pct: number }) {
   return <span className="flex items-center gap-0.5 text-gray-500 text-sm"><Minus className="h-3.5 w-3.5" /> 0%</span>;
 }
 
-export default function MoversPage() {
-  const risingTools = AI_TOOLS.filter((t) => t.trending === "up")
+export default async function MoversPage() {
+  const allTools = await getEnrichedTools();
+  const risingTools = allTools.filter((t) => t.trending === "up")
     .sort((a, b) => b.trendPercent - a.trendPercent)
     .slice(0, 8);
-  const fallingTools = AI_TOOLS.filter((t) => t.trending === "down")
+  const fallingTools = allTools.filter((t) => t.trending === "down")
     .sort((a, b) => b.trendPercent - a.trendPercent)
     .slice(0, 5);
 

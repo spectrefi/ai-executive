@@ -1681,15 +1681,16 @@ export const AI_TOOLS: AITool[] = [
   },
 ];
 
-// Compute currentRank from scores.overall so rank always matches score.
-// previousRank stays as manually set (represents last week's position).
-// trending is recomputed from the delta so it stays consistent too.
+// Derive currentRank from scores.overall. previousRank and trending are set to
+// stable defaults here — getEnrichedTools() in lib/rank-history.ts overwrites
+// them with real values from the Redis snapshot at request time.
 ;(function assignRanks() {
   const sorted = [...AI_TOOLS].sort((a, b) => b.scores.overall - a.scores.overall);
   sorted.forEach((tool, i) => {
     tool.currentRank = i + 1;
-    const delta = tool.previousRank - tool.currentRank;
-    tool.trending = delta > 0 ? "up" : delta < 0 ? "down" : "stable";
+    tool.previousRank = i + 1; // stable baseline until snapshot loads
+    tool.trending = "stable";
+    tool.trendPercent = 0;
   });
 })();
 

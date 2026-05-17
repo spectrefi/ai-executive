@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AI_TOOLS, getToolById } from "@/lib/data/tools";
+import { getEnrichedToolById } from "@/lib/rank-history";
 import { buildMetadata, toolJsonLd } from "@/lib/seo";
 import { getToolHistory } from "@/lib/data/history";
 import ScoreBadge from "@/components/ScoreBadge";
@@ -44,7 +45,7 @@ const SCORE_LABELS: { key: string; label: string }[] = [
 
 export default async function ToolPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const tool = getToolById(slug);
+  const tool = await getEnrichedToolById(slug);
   if (!tool) notFound();
   const history = getToolHistory(slug);
 

@@ -1,6 +1,7 @@
 import { getArchive, getArchiveStats } from "@/lib/news-archive";
 import { getSourceScores } from "@/lib/vote-store";
 import { AI_TOOLS } from "@/lib/data/tools";
+import { getEnrichedTools } from "@/lib/rank-history";
 import { RSS_FEEDS_META } from "@/lib/rss-meta";
 import Link from "next/link";
 import { Database, Rss, ThumbsUp, ThumbsDown, Archive, TrendingUp, TrendingDown, Minus, ExternalLink } from "lucide-react";
@@ -28,10 +29,11 @@ function Weight({ w }: { w: number }) {
 }
 
 export default async function AdminPage() {
-  const [archiveStats, archive, sourceScores] = await Promise.all([
+  const [archiveStats, archive, sourceScores, enrichedTools] = await Promise.all([
     getArchiveStats(),
     getArchive(),
     getSourceScores(),
+    getEnrichedTools(),
   ]);
   const recentArchive = archive.slice(0, 50);
 
@@ -41,7 +43,7 @@ export default async function AdminPage() {
   ).sort();
 
   const toolCount = AI_TOOLS.length;
-  const toolsWithRising = AI_TOOLS.filter((t) => t.trending === "up").length;
+  const toolsWithRising = enrichedTools.filter((t) => t.trending === "up").length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">

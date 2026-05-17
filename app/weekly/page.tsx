@@ -1,5 +1,6 @@
 import { buildMetadata } from "@/lib/seo";
 import { AI_TOOLS } from "@/lib/data/tools";
+import { getEnrichedToolsSorted } from "@/lib/rank-history";
 import { CHANGELOG } from "@/lib/data/changelog";
 import { FUNDING_ROUNDS } from "@/lib/data/funding";
 import { getTopHacks } from "@/lib/data/hacks";
@@ -26,10 +27,11 @@ function WeekRange() {
   return <>{fmt(monday)} – {fmt(sunday)}, {now.getFullYear()}</>;
 }
 
-export default function WeeklyPage() {
-  const topTools = AI_TOOLS.slice(0, 5);
-  const risingTools = AI_TOOLS.filter((t) => t.trending === "up").sort((a, b) => b.trendPercent - a.trendPercent).slice(0, 3);
-  const fallingTools = AI_TOOLS.filter((t) => t.trending === "down").slice(0, 3);
+export default async function WeeklyPage() {
+  const allTools = await getEnrichedToolsSorted();
+  const topTools = allTools.slice(0, 5);
+  const risingTools = allTools.filter((t) => t.trending === "up").sort((a, b) => b.trendPercent - a.trendPercent).slice(0, 3);
+  const fallingTools = allTools.filter((t) => t.trending === "down").slice(0, 3);
   const recentChangelog = CHANGELOG.slice(0, 5);
   const recentFunding = FUNDING_ROUNDS.slice(0, 3);
   const topHacks = getTopHacks(3);

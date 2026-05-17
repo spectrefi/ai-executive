@@ -1,5 +1,6 @@
 import { buildMetadata, JSON_LD_SITE } from "@/lib/seo";
 import { AI_TOOLS } from "@/lib/data/tools";
+import { getEnrichedToolsSorted } from "@/lib/rank-history";
 import { DAILY_NEWS } from "@/lib/data/news";
 import { fetchLiveNews } from "@/lib/rss";
 import { fetchAllSentiment } from "@/lib/sentiment";
@@ -23,14 +24,15 @@ export const metadata = buildMetadata({
 });
 
 export default async function HomePage() {
-  const top3 = AI_TOOLS.slice(0, 3);
-  const [liveNews, sentiment] = await Promise.all([
+  const [tools, liveNews, sentiment] = await Promise.all([
+    getEnrichedToolsSorted(),
     fetchLiveNews().catch(() => []),
     fetchAllSentiment(AI_TOOLS.map((t) => t.id)).catch(() => ({})),
   ]);
+  const top3 = tools.slice(0, 3);
   const allNews = liveNews.length >= 5 ? liveNews : DAILY_NEWS;
   const recentNews = allNews.slice(0, 4);
-  const totalUsers = AI_TOOLS.reduce((sum, t) => sum + t.weeklyUsers, 0);
+  const totalUsers = tools.reduce((sum, t) => sum + t.weeklyUsers, 0);
 
   return (
     <>
@@ -82,7 +84,7 @@ export default async function HomePage() {
           {/* Stats bar */}
           <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { label: "Tools Tracked", value: String(AI_TOOLS.length), unit: "platforms" },
+              { label: "Tools Tracked", value: String(tools.length), unit: "platforms" },
               { label: "Weekly Users", value: formatNumber(totalUsers), unit: "combined" },
               { label: "Data Sources", value: "12+", unit: "aggregated" },
               { label: "Refresh Cycle", value: "4 hrs", unit: "rolling cadence" },
@@ -100,7 +102,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <ExecSummary news={allNews} tools={AI_TOOLS} />
+      <ExecSummary news={allNews} tools={tools} />
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         {/* Top 3 spotlight */}
@@ -132,7 +134,7 @@ export default async function HomePage() {
               <div className="text-xs text-gray-500">Click column headers to sort</div>
             </div>
             <LeaderboardTable
-              tools={AI_TOOLS.map(({ id, name, company, logo, logoColor, currentRank, previousRank, scores, weeklyUsers, trending, trendPercent }) => ({
+              tools={tools.map(({ id, name, company, logo, logoColor, currentRank, previousRank, scores, weeklyUsers, trending, trendPercent }) => ({
                 id, name, company, logo, logoColor, currentRank, previousRank, scores, weeklyUsers, trending, trendPercent,
               }))}
               sentiment={sentiment}
@@ -191,7 +193,7 @@ export default async function HomePage() {
 
         {/* Editor's Pick — featured tool spotlight */}
         {(() => {
-          const featured = AI_TOOLS.find((t) => t.id === "cursor") ?? AI_TOOLS[0];
+          const featured = tools.find((t) => t.id === "cursor") ?? tools[0];
           return (
             <section className="mt-16">
               <div className="mb-4 flex items-center gap-2">

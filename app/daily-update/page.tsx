@@ -1,6 +1,6 @@
 import { buildMetadata, SITE_URL } from "@/lib/seo";
 import { DAILY_NEWS } from "@/lib/data/news";
-import { AI_TOOLS } from "@/lib/data/tools";
+import { getEnrichedTools } from "@/lib/rank-history";
 import { fetchLiveNews } from "@/lib/rss";
 import NewsCard from "@/components/NewsCard";
 import TrendBadge from "@/components/TrendBadge";
@@ -48,7 +48,8 @@ export default async function DailyUpdatePage() {
   if (news.length < 5) news = DAILY_NEWS;
   const isLive = news !== DAILY_NEWS && news.length > 0;
 
-  const movers = AI_TOOLS.filter((t) => t.trending !== "stable").sort(
+  const allTools = await getEnrichedTools();
+  const movers = allTools.filter((t) => t.trending !== "stable").sort(
     (a, b) => b.trendPercent - a.trendPercent
   );
 
