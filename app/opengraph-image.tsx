@@ -67,7 +67,7 @@ export default function OgImage() {
           <span style={{ color: "#a78bfa" }}>Ranked Live</span>
         </div>
         <div style={{ color: "#9ca3af", fontSize: "20px", marginBottom: "44px" }}>
-          Daily benchmarks across {AI_TOOLS.length} platforms · Updated every 24 hours
+          Daily benchmarks across {AI_TOOLS.length} platforms · Updated every 4 hours
         </div>
 
         {/* Top 5 tools */}

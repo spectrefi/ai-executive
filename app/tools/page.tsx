@@ -6,9 +6,9 @@ export const revalidate = 14400;
 
 
 export const metadata = buildMetadata({
-  title: "All 25 AI Tools — Ranked & Reviewed 2026",
+  title: "All 50 AI Tools — Ranked & Reviewed 2026",
   description:
-    "Browse all 25 top AI tools ranked by performance. Filter by category, industry, or use case to find the best AI for your needs.",
+    "Browse all 50 top AI tools ranked by performance. Filter by category, industry, or use case to find the best AI for your needs.",
   path: "/tools",
 });
 

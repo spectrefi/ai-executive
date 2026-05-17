@@ -1,4 +1,5 @@
 import { buildMetadata } from "@/lib/seo";
+import { AI_TOOLS } from "@/lib/data/tools";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 export const revalidate = 14400;
@@ -125,7 +126,7 @@ export default function MethodologyPage() {
         <h2 className="text-xl font-bold text-white">Principles</h2>
         <ul className="space-y-2 text-gray-300 text-sm list-disc list-inside">
           <li>All scores aggregate from <strong>publicly available, independent benchmarks</strong> — we do not use vendor-supplied numbers as primary sources.</li>
-          <li>Raw benchmark scores are <strong>min-max normalised to 0–100</strong> across all 25 tracked tools. 100 = best in class within this set.</li>
+          <li>Raw benchmark scores are <strong>min-max normalised to 0–100</strong> across all {AI_TOOLS.length} tracked tools. 100 = best in class within this set.</li>
           <li>Objective scores (benchmarks with defined metrics) and subjective scores (human-preference evaluations) are <strong>clearly distinguished</strong>.</li>
           <li>Update cadences are published and followed. Stale data is flagged.</li>
         </ul>

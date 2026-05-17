@@ -10,7 +10,7 @@ export const revalidate = 14400;
 export const metadata = buildMetadata({
   title: "AI Tool Ranking Trends — Who's Rising & Falling",
   description:
-    "6-week rank and score movement across the top 25 AI tools. See which AI platforms are gaining ground and which are slipping.",
+    "6-week rank and score movement across the top 50 AI tools. See which AI platforms are gaining ground and which are slipping.",
   path: "/trends",
 });
 

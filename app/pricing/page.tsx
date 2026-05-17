@@ -6,9 +6,9 @@ export const revalidate = 14400;
 
 
 export const metadata = buildMetadata({
-  title: "AI Tool Pricing Comparison 2026 — All 25 Platforms",
+  title: "AI Tool Pricing Comparison 2026 — All 50 Platforms",
   description:
-    "Side-by-side pricing for the top 25 AI tools. Compare free tiers, subscription plans, API costs, and per-seat pricing for ChatGPT, Claude, Gemini, and more.",
+    "Side-by-side pricing for the top 50 AI tools. Compare free tiers, subscription plans, API costs, and per-seat pricing for ChatGPT, Claude, Gemini, and more.",
   path: "/pricing",
 });
 
@@ -45,7 +45,7 @@ export default function PricingPage() {
           AI Tool Pricing Comparison
         </h1>
         <p className="text-gray-400">
-          All 25 platforms. Free tiers, subscription costs, API pricing, and per-seat plans —
+          All {AI_TOOLS.length} platforms. Free tiers, subscription costs, API pricing, and per-seat plans —
           updated{" "}
           {new Date().toLocaleDateString("en-US", {
             month: "long",

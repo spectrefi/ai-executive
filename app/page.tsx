@@ -62,7 +62,7 @@ export default async function HomePage() {
               </span>
             </h1>
             <p className="mb-8 text-lg leading-relaxed text-gray-400">
-              Performance benchmarks across the top 25 AI platforms, refreshed every 4 hours. Compare tools by
+              Performance benchmarks across the top {tools.length} AI platforms, refreshed every 4 hours. Compare tools by
               industry, use case, or company size — and always know which AI is winning today.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -86,7 +86,7 @@ export default async function HomePage() {
             {[
               { label: "Tools Tracked", value: String(tools.length), unit: "platforms" },
               { label: "Weekly Users", value: formatNumber(totalUsers), unit: "combined" },
-              { label: "Data Sources", value: "12+", unit: "aggregated" },
+              { label: "Data Sources", value: "8+", unit: "aggregated" },
               { label: "Refresh Cycle", value: "4 hrs", unit: "rolling cadence" },
             ].map((s) => (
               <div
