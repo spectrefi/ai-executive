@@ -50,7 +50,10 @@ export default async function AdminPage() {
           <h1 className="text-2xl font-extrabold text-white">Admin Dashboard</h1>
           <p className="mt-1 text-sm text-gray-500">Internal view — not linked from the public site</p>
         </div>
-        <Link href="/" className="text-sm text-blue-400 hover:text-blue-300">← Back to site</Link>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/status" className="text-sm text-violet-400 hover:text-violet-300 font-medium">🩺 Control Panel</Link>
+          <Link href="/" className="text-sm text-blue-400 hover:text-blue-300">← Back to site</Link>
+        </div>
       </div>
 
       {/* Top stats */}

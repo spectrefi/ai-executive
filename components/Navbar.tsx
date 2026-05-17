@@ -27,9 +27,12 @@ const INTELLIGENCE_LINKS = [
   { href: "/funding", label: "💸 VC Funding", desc: "Rounds, valuations, what it means" },
   { href: "/hardware-advisor", label: "🖥️ Hardware Advisor", desc: "Which models can your PC run?" },
   { href: "/quiz", label: "🎯 AI Buyer's Quiz", desc: "Find your perfect AI stack in 60 seconds" },
+  { href: "/breaking", label: "🚨 Breaking News", desc: "Real-time AI launches & rank alerts, auto-posted" },
 ];
 
 const MORE_LINKS = [
+  { href: "/badges", label: "Tool Badges", desc: "Live SVG ranking badges for your site or README" },
+  { href: "/leaderboard-card", label: "Rankings Card", desc: "Download & share this week's top 10 image" },
   { href: "/alternatives", label: "Alternatives", desc: "Best replacements for every AI tool" },
   { href: "/jobs", label: "AI Jobs", desc: "Roles at Anthropic, OpenAI & more" },
   { href: "/advertise", label: "Advertise", desc: "Reach 25,000+ AI buyers monthly" },

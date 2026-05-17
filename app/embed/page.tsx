@@ -19,6 +19,34 @@ export default function EmbedPage() {
         Add live AI tool rankings to your site, blog, or newsletter — free, one line of code.
       </p>
 
+      {/* Other shareable products */}
+      <div className="mb-10 grid gap-4 sm:grid-cols-3">
+        <a
+          href="/leaderboard-card"
+          className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5 hover:border-violet-500/40 transition-colors"
+        >
+          <div className="text-2xl mb-2">📊</div>
+          <div className="font-semibold text-white text-sm mb-1">Rankings Card</div>
+          <div className="text-xs text-gray-500">Download or share the weekly top-10 power rankings image.</div>
+        </a>
+        <a
+          href="/badges"
+          className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5 hover:border-violet-500/40 transition-colors"
+        >
+          <div className="text-2xl mb-2">🏅</div>
+          <div className="font-semibold text-white text-sm mb-1">Tool Badges</div>
+          <div className="text-xs text-gray-500">SVG badges for any AI tool — embed in READMEs and sites.</div>
+        </a>
+        <div className="rounded-xl border border-white/[0.07] bg-[#161c28] p-5">
+          <div className="text-2xl mb-2">⚔️</div>
+          <div className="font-semibold text-white text-sm mb-1">VS Battle Widget</div>
+          <div className="text-xs text-gray-500">
+            Embed a head-to-head compare widget. URL:{" "}
+            <code className="text-violet-400">/embed/compare/tool-a-vs-tool-b</code>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Embed instructions */}
         <div className="space-y-6">
