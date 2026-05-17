@@ -1,30 +1,52 @@
 import { AI_TOOLS, type AITool } from "@/lib/data/tools";
 import { getLastRankingsSnapshot } from "@/lib/rankings-store";
+import { getScoresOverrides } from "@/lib/scores-override-store";
 
 export type EnrichedTool = AITool;
 
 /**
- * Returns a copy of AI_TOOLS with previousRank, trending, and trendPercent
- * populated from the latest Redis rankings snapshot.
+ * Returns a copy of AI_TOOLS with:
+ * - previousRank/trending/trendPercent from Redis rankings snapshot
+ * - scores merged with any live Redis score overrides
  *
- * Falls back to stable / 0 for all tools if no snapshot exists yet
- * (i.e. power-rankings has never been run).
+ * Falls back to static data if no snapshots exist.
  */
 export async function getEnrichedTools(): Promise<EnrichedTool[]> {
-  const snapshot = await getLastRankingsSnapshot();
+  const [snapshot, scoreOverrides] = await Promise.all([
+    getLastRankingsSnapshot(),
+    getScoresOverrides(),
+  ]);
 
   return AI_TOOLS.map((tool) => {
-    if (!snapshot) return { ...tool };
+    // Merge live score overrides
+    const override = scoreOverrides?.tools[tool.id];
+    const scores = override
+      ? {
+          ...tool.scores,
+          ...(override.overall !== undefined && { overall: override.overall }),
+          ...(override.reasoning !== undefined && { reasoning: override.reasoning }),
+          ...(override.coding !== undefined && { coding: override.coding }),
+          ...(override.writing !== undefined && { writing: override.writing }),
+          ...(override.speed !== undefined && { speed: override.speed }),
+          ...(override.costEfficiency !== undefined && { costEfficiency: override.costEfficiency }),
+          ...(override.accuracy !== undefined && { accuracy: override.accuracy }),
+          ...(override.creativity !== undefined && { creativity: override.creativity }),
+          ...(override.contextWindow !== undefined && { contextWindow: override.contextWindow }),
+          ...(override.multimodal !== undefined && { multimodal: override.multimodal }),
+        }
+      : tool.scores;
+
+    if (!snapshot) return { ...tool, scores };
 
     const prev = snapshot.ranks[tool.id];
-    if (!prev) return { ...tool };
+    if (!prev) return { ...tool, scores };
 
-    const delta = prev.rank - tool.currentRank; // positive = moved up
+    const delta = prev.rank - tool.currentRank;
     return {
       ...tool,
+      scores,
       previousRank: prev.rank,
       trending: delta > 0 ? "up" : delta < 0 ? "down" : "stable",
-      // spots moved as a % of where they were — capped at 100
       trendPercent: Math.min(100, Math.round((Math.abs(delta) / prev.rank) * 100)),
     };
   });

@@ -1,9 +1,10 @@
 import { buildMetadata } from "@/lib/seo";
-import { AI_STOCKS, MOVER_SIGNALS, SIGNAL_META } from "@/lib/data/market-movers";
+import { MOVER_SIGNALS, SIGNAL_META } from "@/lib/data/market-movers";
 import { getEnrichedTools } from "@/lib/rank-history";
+import { fetchLiveStocks } from "@/lib/stocks-store";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, Minus, BarChart2, ExternalLink } from "lucide-react";
-export const revalidate = 3600;
+import { TrendingUp, TrendingDown, Minus, BarChart2, ExternalLink, Radio, Clock } from "lucide-react";
+export const dynamic = "force-dynamic"; // live stocks via Redis-cached Yahoo Finance fetch
 
 export const metadata = buildMetadata({
   title: "AI Market Movers 2026 — Stocks, Funding & Tool Momentum",
@@ -26,7 +27,10 @@ function ChangeChip({ pct }: { pct: number }) {
 }
 
 export default async function MoversPage() {
-  const allTools = await getEnrichedTools();
+  const [allTools, { stocks, fetchedAt, isLive }] = await Promise.all([
+    getEnrichedTools(),
+    fetchLiveStocks(),
+  ]);
   const risingTools = allTools.filter((t) => t.trending === "up")
     .sort((a, b) => b.trendPercent - a.trendPercent)
     .slice(0, 8);
@@ -34,8 +38,11 @@ export default async function MoversPage() {
     .sort((a, b) => b.trendPercent - a.trendPercent)
     .slice(0, 5);
 
-  const topGainer = [...AI_STOCKS].sort((a, b) => b.change1w - a.change1w)[0];
-  const topLoser = [...AI_STOCKS].sort((a, b) => a.change1w - b.change1w)[0];
+  const topGainer = [...stocks].sort((a, b) => b.change1w - a.change1w)[0];
+  const topLoser = [...stocks].sort((a, b) => a.change1w - b.change1w)[0];
+  const priceAge = fetchedAt !== "hardcoded"
+    ? new Date(fetchedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" })
+    : null;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -80,7 +87,18 @@ export default async function MoversPage() {
         <div className="lg:col-span-2 space-y-10">
           {/* Stock table */}
           <section>
-            <h2 className="mb-4 text-lg font-bold text-white">AI Company Stocks</h2>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">AI Company Stocks</h2>
+              {isLive && priceAge ? (
+                <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+                  <Radio className="h-3 w-3 animate-pulse" /> Live · as of {priceAge}
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 text-xs text-gray-500">
+                  <Clock className="h-3 w-3" /> Indicative prices
+                </span>
+              )}
+            </div>
             <div className="overflow-hidden rounded-xl border border-white/[0.07]">
               <table className="w-full text-sm">
                 <thead>
@@ -94,7 +112,7 @@ export default async function MoversPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04] bg-[#161c28]">
-                  {AI_STOCKS.map((stock) => (
+                  {stocks.map((stock) => (
                     <tr key={stock.ticker} className="hover:bg-white/[0.02] transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
@@ -115,7 +133,7 @@ export default async function MoversPage() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-2 text-xs text-gray-600">* Prices indicative. Data refreshed periodically. Not financial advice.</p>
+            <p className="mt-2 text-xs text-gray-600">* {isLive ? "Live prices via Yahoo Finance, cached 15 min." : "Indicative prices."} Not financial advice.</p>
           </section>
 
           {/* Market signals */}
@@ -190,7 +208,7 @@ export default async function MoversPage() {
           <section className="rounded-xl border border-white/[0.07] bg-[#161c28] p-4">
             <h3 className="mb-3 text-sm font-semibold text-white">Why these stocks matter</h3>
             <div className="space-y-2">
-              {AI_STOCKS.slice(0, 4).map((s) => (
+              {stocks.slice(0, 4).map((s) => (
                 <div key={s.ticker} className="text-xs text-gray-500">
                   <span className="font-semibold" style={{ color: s.color }}>{s.ticker}</span>
                   {" — "}{s.relevance}

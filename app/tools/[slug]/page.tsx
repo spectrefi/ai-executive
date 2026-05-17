@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { AI_TOOLS, getToolById } from "@/lib/data/tools";
 import { getEnrichedToolById } from "@/lib/rank-history";
 import { buildMetadata, toolJsonLd } from "@/lib/seo";
-import { getToolHistory } from "@/lib/data/history";
+import { getToolScoreHistory } from "@/lib/score-history-store";
 import ScoreBadge from "@/components/ScoreBadge";
 import TrendBadge from "@/components/TrendBadge";
 import ComparisonBar from "@/components/ComparisonBar";
@@ -47,7 +47,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const tool = await getEnrichedToolById(slug);
   if (!tool) notFound();
-  const history = getToolHistory(slug);
+  const history = await getToolScoreHistory(slug);
 
   return (
     <>

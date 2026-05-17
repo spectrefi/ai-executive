@@ -1,0 +1,34 @@
+name: Daily Data Refresh
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # Every day at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update benchmark scores
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/update-scores" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 120
+        continue-on-error: true
+
+      - name: Update API pricing
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/update-pricing" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 120
+        continue-on-error: true
+
+      - name: Trigger power rankings snapshot
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/power-rankings" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 90
+        continue-on-error: true

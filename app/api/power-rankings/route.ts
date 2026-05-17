@@ -9,6 +9,7 @@ import {
   buildCurrentSnapshot,
   calcMovers,
 } from "@/lib/rankings-store";
+import { saveScoreSnapshot } from "@/lib/score-history-store";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -116,8 +117,11 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Save snapshot for next week's comparison
-  await saveRankingsSnapshot(buildCurrentSnapshot(sorted));
+  // Save snapshot for next week's comparison + daily score history
+  await Promise.all([
+    saveRankingsSnapshot(buildCurrentSnapshot(sorted)),
+    saveScoreSnapshot(sorted),
+  ]);
 
   return NextResponse.json({ ok: true, threadUrl, emailSent, moversCount: movers.length });
 }
