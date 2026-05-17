@@ -1681,6 +1681,18 @@ export const AI_TOOLS: AITool[] = [
   },
 ];
 
+// Compute currentRank from scores.overall so rank always matches score.
+// previousRank stays as manually set (represents last week's position).
+// trending is recomputed from the delta so it stays consistent too.
+;(function assignRanks() {
+  const sorted = [...AI_TOOLS].sort((a, b) => b.scores.overall - a.scores.overall);
+  sorted.forEach((tool, i) => {
+    tool.currentRank = i + 1;
+    const delta = tool.previousRank - tool.currentRank;
+    tool.trending = delta > 0 ? "up" : delta < 0 ? "down" : "stable";
+  });
+})();
+
 export function getToolById(id: string): AITool | undefined {
   const tool = AI_TOOLS.find((t) => t.id === id);
   if (tool && !tool.enterprise) {
