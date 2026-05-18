@@ -85,7 +85,7 @@ export default async function HomePage() {
           <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
               { label: "Tools Tracked", value: String(tools.length), unit: "platforms" },
-              { label: "Weekly Users", value: formatNumber(totalUsers), unit: "combined" },
+              { label: "Weekly Users", value: `~${formatNumber(totalUsers)}`, unit: "est. combined" },
               { label: "Data Sources", value: "8+", unit: "aggregated" },
               { label: "Refresh Cycle", value: "4 hrs", unit: "rolling cadence" },
             ].map((s) => (

@@ -9,6 +9,14 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
+      - name: Update weekly user estimates
+        run: |
+          curl -f -X POST "${{ secrets.SITE_URL }}/api/update-users" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 120
+        continue-on-error: true
+
       - name: Update benchmark scores
         run: |
           curl -f -X POST "${{ secrets.SITE_URL }}/api/update-scores" \
